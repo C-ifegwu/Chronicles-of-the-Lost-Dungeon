@@ -4,9 +4,7 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
-    
-    private PlayerControls playerControls;
-    
+
     public Vector2 MoveInput { get; private set; }
     public bool MeleeTriggered { get; private set; }
     public bool RangedTriggered { get; private set; }
@@ -20,38 +18,28 @@ public class InputManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        playerControls = new PlayerControls();
-        ConfigurePlatformSpecifics();
     }
 
     private void Update()
     {
-        // Read movement continuously every frame
-        MoveInput = playerControls.Gameplay.Move.ReadValue<Vector2>();
+        float x = 0;
+        float y = 0;
 
-        // .triggered guarantees the input fires exactly once per button press
-        MeleeTriggered = playerControls.Gameplay.MeleeAttack.triggered;
-        RangedTriggered = playerControls.Gameplay.RangedAttack.triggered;
-    }
+        // Direct hardware polling: 100% immune to Action Map asset bugs
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) y = 1;
+            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) y = -1;
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) x = -1;
+            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) x = 1;
+        }
 
-    private void ConfigurePlatformSpecifics()
-    {
-        #if UNITY_ANDROID || UNITY_IOS
-            Debug.Log("Mobile Build Detected: Touch controls will be enabled via UI.");
-        #elif UNITY_STANDALONE_WIN || UNITY_WEBGL || UNITY_EDITOR
-            Debug.Log("PC/Web Build Detected: Keyboard and Mouse controls active.");
-        #endif
-    }
+        MoveInput = new Vector2(x, y).normalized;
 
-    private void OnEnable()
-    {
-        playerControls?.Enable();
-        playerControls?.Gameplay.Enable(); // Explicitly force the Gameplay map on
-    }
-
-    private void OnDisable()
-    {
-        playerControls?.Disable();
+        if (Mouse.current != null)
+        {
+            MeleeTriggered = Mouse.current.leftButton.wasPressedThisFrame;
+            RangedTriggered = Mouse.current.rightButton.wasPressedThisFrame;
+        }
     }
 }

@@ -8,16 +8,16 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float rotationSpeed = 15f;
 
+    private CharacterController characterController;
     private IAbility currentMeleeAbility;
     private IAbility currentRangedAbility;
-    private InputManager inputManager;
 
     private void Start()
     {
         currentHealth = maxHealth;
-        inputManager = InputManager.Instance;
-        
+        characterController = GetComponent<CharacterController>();
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentRangedAbility = GetComponent<RangedAbility>();
         
@@ -32,29 +32,36 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void HandleMovement()
     {
-        if (inputManager == null) return;
+        if (InputManager.Instance == null) return;
         
-        Vector2 moveInput = inputManager.MoveInput;
+        Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        
-        transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
 
+        if (characterController != null && moveDirection != Vector3.zero)
+        {
+            // Apply slight artificial gravity to keep the CharacterController grounded
+            moveDirection.y = -0.1f; 
+            characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+        }
+
+        // Lock rotation strictly to the Y axis
+        moveDirection.y = 0; 
         if (moveDirection != Vector3.zero)
         {
-            transform.forward = moveDirection;
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
     }
 
     private void HandleCombat()
     {
-        if (inputManager == null) return;
+        if (InputManager.Instance == null) return;
 
-        // Uses the new foolproof triggered variables
-        if (inputManager.MeleeTriggered && currentMeleeAbility != null)
+        if (InputManager.Instance.MeleeTriggered && currentMeleeAbility != null)
         {
             currentMeleeAbility.Execute();
         }
-        else if (inputManager.RangedTriggered && currentRangedAbility != null)
+        else if (InputManager.Instance.RangedTriggered && currentRangedAbility != null)
         {
             currentRangedAbility.Execute();
         }
