@@ -9,7 +9,6 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
 
-    // Strategy Pattern references
     private IAbility currentMeleeAbility;
     private IAbility currentRangedAbility;
     private InputManager inputManager;
@@ -19,11 +18,9 @@ public class PlayerController : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
         inputManager = InputManager.Instance;
         
-        // Fetch abilities attached to the player (Strategy Pattern)
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentRangedAbility = GetComponent<RangedAbility>();
         
-        // Update the UI immediately
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
@@ -40,10 +37,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         Vector2 moveInput = inputManager.MoveInput;
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
         
-        // Simple translation for now; we will upgrade to Rigidbody/CharacterController later
         transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
 
-        // Face the direction of movement
         if (moveDirection != Vector3.zero)
         {
             transform.forward = moveDirection;
@@ -54,11 +49,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         if (inputManager == null) return;
 
-        if (inputManager.IsMeleeAttacking && currentMeleeAbility != null)
+        // Uses the new foolproof triggered variables
+        if (inputManager.MeleeTriggered && currentMeleeAbility != null)
         {
             currentMeleeAbility.Execute();
         }
-        else if (inputManager.IsRangedAttacking && currentRangedAbility != null)
+        else if (inputManager.RangedTriggered && currentRangedAbility != null)
         {
             currentRangedAbility.Execute();
         }
@@ -67,8 +63,6 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
-        
-        // Fire event to update the UI
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
@@ -79,7 +73,6 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void Die()
     {
-        // Fire event to show Game Over screen
         GameEvents.OnPlayerDied?.Invoke();
         Debug.Log("The King has fallen!");
     }
