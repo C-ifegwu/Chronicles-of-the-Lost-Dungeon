@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         currentHealth = maxHealth;
         characterController = GetComponent<CharacterController>();
+        
+        // Fetch Strategy Pattern abilities
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentRangedAbility = GetComponent<RangedAbility>();
         
@@ -39,12 +41,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (characterController != null && moveDirection != Vector3.zero)
         {
-            // Apply slight artificial gravity to keep the CharacterController grounded
-            moveDirection.y = -0.1f; 
+            // Apply slight artificial gravity to keep the CharacterController glued to the floor
+            moveDirection.y = -0.5f; 
             characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
         }
 
-        // Lock rotation strictly to the Y axis
+        // Lock rotation strictly to the horizontal plane
         moveDirection.y = 0; 
         if (moveDirection != Vector3.zero)
         {

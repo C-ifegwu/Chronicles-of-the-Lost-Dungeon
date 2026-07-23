@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
@@ -22,24 +21,14 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        float x = 0;
-        float y = 0;
-
-        // Direct hardware polling: 100% immune to Action Map asset bugs
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) y = 1;
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) y = -1;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) x = -1;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) x = 1;
-        }
+        // Legacy Input System: Directly reads hardware, no Action Maps required.
+        float x = Input.GetAxisRaw("Horizontal"); // A/D or Left/Right Arrows
+        float y = Input.GetAxisRaw("Vertical");   // W/S or Up/Down Arrows
 
         MoveInput = new Vector2(x, y).normalized;
 
-        if (Mouse.current != null)
-        {
-            MeleeTriggered = Mouse.current.leftButton.wasPressedThisFrame;
-            RangedTriggered = Mouse.current.rightButton.wasPressedThisFrame;
-        }
+        // 0 = Left Click, 1 = Right Click
+        MeleeTriggered = Input.GetMouseButtonDown(0); 
+        RangedTriggered = Input.GetMouseButtonDown(1);
     }
 }
