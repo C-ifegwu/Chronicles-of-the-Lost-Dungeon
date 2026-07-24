@@ -9,6 +9,8 @@ public class InputManager : MonoBehaviour
     public bool SpecialTriggered { get; private set; }
     public bool IsBlocking { get; private set; }
     public bool IsSprinting { get; private set; }
+    public bool JumpTriggered { get; private set; }
+    public bool DodgeTriggered { get; private set; }
 
     private void Awake()
     {
@@ -23,17 +25,16 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        // Movement
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
         MoveInput = new Vector2(x, y).normalized;
 
-        // Combat Actions
         MeleeTriggered = Input.GetMouseButtonDown(0);
         IsBlocking = Input.GetMouseButton(1);
         SpecialTriggered = Input.GetKeyDown(KeyCode.E);
-        
-        // Sprint Action
         IsSprinting = Input.GetKey(KeyCode.LeftShift); 
+        
+        JumpTriggered = Input.GetKeyDown(KeyCode.Space);
+        DodgeTriggered = Input.GetKeyDown(KeyCode.LeftAlt);
     }
 }

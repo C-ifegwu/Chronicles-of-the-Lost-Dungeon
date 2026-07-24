@@ -23,33 +23,35 @@ public class PlayerAnimator : MonoBehaviour
 
         animator.speed = globalAnimationSpeed;
 
-        // Clean mapping: 0 = Idle, 1 = Walk, 2 = Sprint
         float animationSpeedState = 0f;
         if (InputManager.Instance.MoveInput.magnitude > 0.1f)
         {
             animationSpeedState = InputManager.Instance.IsSprinting ? 2f : 1f;
         }
-        
         animator.SetFloat("Speed", animationSpeedState);
 
         animator.SetBool("IsBlocking", InputManager.Instance.IsBlocking);
 
-        if (InputManager.Instance.MeleeTriggered)
-        {
-            animator.SetTrigger("MeleeAttack");
-        }
-        if (InputManager.Instance.SpecialTriggered)
-        {
-            animator.SetTrigger("SpecialAttack");
-        }
+        if (InputManager.Instance.MeleeTriggered) animator.SetTrigger("MeleeAttack");
+        if (InputManager.Instance.SpecialTriggered) animator.SetTrigger("SpecialAttack");
+        
+        if (InputManager.Instance.JumpTriggered) animator.SetTrigger("Jump");
+        if (InputManager.Instance.DodgeTriggered) animator.SetTrigger("Dodge");
     }
 
     public void SetAnimationSpeed(float newSpeedMultiplier)
     {
         globalAnimationSpeed = newSpeedMultiplier;
-        if (animator != null)
-        {
-            animator.speed = globalAnimationSpeed;
-        }
+        if (animator != null) animator.speed = globalAnimationSpeed;
+    }
+
+    public void TriggerHit()
+    {
+        if (animator != null) animator.SetTrigger("GetHit");
+    }
+
+    public void TriggerDeath()
+    {
+        if (animator != null) animator.SetTrigger("Death");
     }
 }
