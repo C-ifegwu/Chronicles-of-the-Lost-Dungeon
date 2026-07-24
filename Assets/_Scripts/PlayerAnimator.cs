@@ -12,14 +12,24 @@ public class PlayerAnimator : MonoBehaviour
 
     private void Update()
     {
-        // Safety check to prevent silent errors
         if (InputManager.Instance == null || animator == null) return;
 
-        // .magnitude converts the Vector2 (X, Y) into a single positive number
-        // It will be 0 when standing still, and greater than 0 when moving
+        // 1. Handle Movement Speed
         float currentSpeed = InputManager.Instance.MoveInput.magnitude;
-        
-        // Feed that number directly into the Animator parameter we created
         animator.SetFloat("Speed", currentSpeed);
+
+        // 2. Handle Blocking Stance
+        animator.SetBool("IsBlocking", InputManager.Instance.IsBlocking);
+
+        // 3. Handle Attack Triggers
+        if (InputManager.Instance.MeleeTriggered)
+        {
+            animator.SetTrigger("MeleeAttack");
+        }
+
+        if (InputManager.Instance.SpecialTriggered)
+        {
+            animator.SetTrigger("SpecialAttack");
+        }
     }
 }
