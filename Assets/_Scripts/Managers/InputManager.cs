@@ -8,6 +8,7 @@ public class InputManager : MonoBehaviour
     public bool MeleeTriggered { get; private set; }
     public bool SpecialTriggered { get; private set; }
     public bool IsBlocking { get; private set; }
+    public bool IsSprinting { get; private set; }
 
     private void Awake()
     {
@@ -27,9 +28,12 @@ public class InputManager : MonoBehaviour
         float y = Input.GetAxisRaw("Vertical");
         MoveInput = new Vector2(x, y).normalized;
 
-        // Combat Actions (Old Input System)
-        MeleeTriggered = Input.GetMouseButtonDown(0); // Left Click to swing
-        IsBlocking = Input.GetMouseButton(1);         // Hold Right Click to block
-        SpecialTriggered = Input.GetKeyDown(KeyCode.E); // Press 'E' for Special Attack
+        // Combat Actions
+        MeleeTriggered = Input.GetMouseButtonDown(0);
+        IsBlocking = Input.GetMouseButton(1);
+        SpecialTriggered = Input.GetKeyDown(KeyCode.E);
+        
+        // Sprint Action
+        IsSprinting = Input.GetKey(KeyCode.LeftShift); 
     }
 }

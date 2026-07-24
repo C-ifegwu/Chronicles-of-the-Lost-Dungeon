@@ -7,7 +7,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     private int currentHealth;
 
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float walkSpeed = 6f;
+    [SerializeField] private float sprintMultiplier = 1.5f;
     [SerializeField] private float rotationSpeed = 15f;
 
     private CharacterController characterController;
@@ -40,8 +41,11 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (characterController != null && moveDirection != Vector3.zero)
         {
+            // Calculate the active speed based on the sprint key
+            float activeSpeed = InputManager.Instance.IsSprinting ? walkSpeed * sprintMultiplier : walkSpeed;
+            
             moveDirection.y = -0.5f; 
-            characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+            characterController.Move(moveDirection * activeSpeed * Time.deltaTime);
         }
 
         moveDirection.y = 0; 
