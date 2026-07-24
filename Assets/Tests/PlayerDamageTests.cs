@@ -5,8 +5,8 @@ using UnityEngine.TestTools;
 
 public class PlayerDamageTests
 {
-    [Test]
-    public void Player_TakeLethalDamage_DisablesController()
+    [UnityTest]
+    public IEnumerator Player_TakeLethalDamage_DisablesController()
     {
         // 1. Arrange: Set up a dummy player object with required components
         GameObject playerObject = new GameObject("TestKing");
@@ -14,6 +14,9 @@ public class PlayerDamageTests
         playerObject.AddComponent<CharacterController>();
         playerObject.AddComponent<PlayerAnimator>();
         
+        // Wait exactly one frame to allow Unity to run Start() and link the components together
+        yield return null;
+
         // 2. Act: Deal exactly 100 damage (the default max health)
         player.TakeDamage(100);
 
@@ -21,6 +24,6 @@ public class PlayerDamageTests
         Assert.IsFalse(player.enabled, "The PlayerController script should disable itself upon dying.");
         
         // Cleanup
-        GameObject.DestroyImmediate(playerObject);
+        Object.Destroy(playerObject);
     }
 }
