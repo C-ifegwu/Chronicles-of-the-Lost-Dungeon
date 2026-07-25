@@ -89,8 +89,23 @@ public class EnemyController : MonoBehaviour, IDamageable
             }
         }
         
-        IDamageable damageable = target.GetComponent<IDamageable>();
-        if (damageable != null) damageable.TakeDamage(attackDamage);
+        // Instant damage has been completely removed from here!
+    }
+
+    // NEW METHOD: This is called strictly by the Animation Event in the timeline
+    public void DealMeleeDamage()
+    {
+        if (target == null) return;
+
+        // Make sure the King didn't dodge away during the swing!
+        float distanceToKing = Vector3.Distance(transform.position, target.position);
+        
+        // If the King is still within hitting range (stopping distance + a small buffer)
+        if (distanceToKing <= agent.stoppingDistance + 1.0f) 
+        {
+            IDamageable damageable = target.GetComponent<IDamageable>();
+            if (damageable != null) damageable.TakeDamage(attackDamage);
+        }
     }
 
     // --- LASER LOGIC ---
@@ -127,24 +142,20 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         isDead = true;
 
-        // Stop the NavMeshAgent so the corpse doesn't keep sliding toward the King
         if (agent != null && agent.isOnNavMesh)
         {
             agent.isStopped = true;
             agent.enabled = false;
         }
 
-        // Trigger the death animation
         if (animator != null && !string.IsNullOrEmpty(deathTriggerName))
         {
             animator.SetTrigger(deathTriggerName);
         }
         
-        // Remove the collider so the King can walk over the body
         Collider coll = GetComponent<Collider>();
         if (coll != null) coll.enabled = false;
 
-        // Wait 4 seconds for the animation to finish, then destroy the body
         Destroy(gameObject, 4f); 
     }
 }
