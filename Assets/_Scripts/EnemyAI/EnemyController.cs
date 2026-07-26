@@ -65,7 +65,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player != null) playerTransform = player.transform;
 
-        ChangeState(new EnemyIdleState());
+        // Swapped Idle for Patrol so enemies wander around on start!
+        ChangeState(new EnemyPatrolState());
     }
 
     private void Update()
