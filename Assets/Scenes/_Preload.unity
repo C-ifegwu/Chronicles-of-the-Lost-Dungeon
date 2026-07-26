@@ -212,6 +212,8 @@ MonoBehaviour:
   maxHealth: 50
   attackDamage: 10
   target: {fileID: 0}
+  detectionRadius: 10
+  fieldOfViewAngle: 140
   currentCombatStyle: 1
   attackCooldown: 2
   meleeAttacks:
@@ -550,6 +552,10 @@ PrefabInstance:
       value: King
       objectReference: {fileID: 0}
     - target: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -594,6 +600,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 95549024643180554, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 95549024643180554, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: a22a2f9d5f7b3734aaf3bb5c540cdf06, type: 2}
@@ -629,19 +639,14 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 978944097}
   m_SourcePrefab: {fileID: 100100000, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
---- !u!1 &173107601 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5213014239458159033, guid: 4d75010ad04ddce4f8f88434f2d50394, type: 3}
-  m_PrefabInstance: {fileID: 872383520}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &173107604
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173107601}
-  m_Enabled: 0
+  m_GameObject: {fileID: 5213014238587219353}
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -649,6 +654,8 @@ MonoBehaviour:
   maxHealth: 50
   attackDamage: 10
   target: {fileID: 0}
+  detectionRadius: 15
+  fieldOfViewAngle: 140
   currentCombatStyle: 0
   attackCooldown: 2
   meleeAttacks:
@@ -672,8 +679,8 @@ NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173107601}
-  m_Enabled: 0
+  m_GameObject: {fileID: 5213014238587219353}
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 2
@@ -694,7 +701,7 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173107601}
+  m_GameObject: {fileID: 5213014238587219353}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -721,7 +728,7 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173107601}
+  m_GameObject: {fileID: 5213014238587219353}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -732,7 +739,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
@@ -1068,18 +1075,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 68324314}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &812033367 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
-  m_PrefabInstance: {fileID: 43613576}
-  m_PrefabAsset: {fileID: 0}
 --- !u!136 &812033370
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812033367}
+  m_GameObject: {fileID: 1342959200149749158}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1102,8 +1104,8 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812033367}
-  m_Enabled: 0
+  m_GameObject: {fileID: 1342959200149749158}
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -1111,6 +1113,8 @@ MonoBehaviour:
   maxHealth: 50
   attackDamage: 10
   target: {fileID: 0}
+  detectionRadius: 15
+  fieldOfViewAngle: 140
   currentCombatStyle: 0
   attackCooldown: 2
   meleeAttacks:
@@ -1134,7 +1138,7 @@ NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812033367}
+  m_GameObject: {fileID: 1342959200149749158}
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
@@ -1156,7 +1160,7 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812033367}
+  m_GameObject: {fileID: 1342959200149749158}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -1276,7 +1280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4943035965324684965, guid: 4d75010ad04ddce4f8f88434f2d50394, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5213014239458159033, guid: 4d75010ad04ddce4f8f88434f2d50394, type: 3}
       propertyPath: m_Name
@@ -1338,18 +1342,13 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &978944084 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
-  m_PrefabInstance: {fileID: 126816878}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &978944085
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d30a509ad2604244ace175b58469678, type: 3}
@@ -1361,7 +1360,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfbcd618a7fe2aa429f63648bcf8378c, type: 3}
@@ -1378,7 +1377,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7acb73c2e5a19443ade489419352af2, type: 3}
@@ -1391,13 +1390,17 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 777ab24511cdc4c44b15245f6c9edc0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameAssembly::PlayerController
   maxHealth: 100
+  maxStamina: 100
+  staminaRegenRate: 15
+  meleeStaminaCost: 15
+  specialStaminaCost: 40
   isBlocking: 0
   walkSpeed: 2
   sprintMultiplier: 1
@@ -1410,7 +1413,7 @@ CharacterController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1435,7 +1438,7 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -1462,7 +1465,7 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1485,7 +1488,7 @@ NavMeshObstacle:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 0
@@ -1501,7 +1504,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978944084}
+  m_GameObject: {fileID: 1949430152449188}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f34093e407450d743be73d135aef1834, type: 3}
@@ -1512,19 +1515,14 @@ MonoBehaviour:
   attackAngle: 180
   damageDelay: 0.5
   autoAimRadius: 6
---- !u!1 &1127552770 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
-  m_PrefabInstance: {fileID: 1593781486}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1127552773
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1127552770}
-  m_Enabled: 0
+  m_GameObject: {fileID: 3490026885532319878}
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -1532,6 +1530,8 @@ MonoBehaviour:
   maxHealth: 50
   attackDamage: 10
   target: {fileID: 0}
+  detectionRadius: 15
+  fieldOfViewAngle: 140
   currentCombatStyle: 0
   attackCooldown: 2
   meleeAttacks:
@@ -1553,8 +1553,8 @@ NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1127552770}
-  m_Enabled: 0
+  m_GameObject: {fileID: 3490026885532319878}
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 2
@@ -1575,7 +1575,7 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1127552770}
+  m_GameObject: {fileID: 3490026885532319878}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -1602,7 +1602,7 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1127552770}
+  m_GameObject: {fileID: 3490026885532319878}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1613,7 +1613,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
@@ -3675,19 +3675,14 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1400248248 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1302186489207832, guid: d31d29bd659534649b718966cbf37289, type: 3}
-  m_PrefabInstance: {fileID: 1287322777}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1400248251
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1400248248}
-  m_Enabled: 0
+  m_GameObject: {fileID: 1302185357090945}
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -3695,6 +3690,8 @@ MonoBehaviour:
   maxHealth: 50
   attackDamage: 10
   target: {fileID: 0}
+  detectionRadius: 15
+  fieldOfViewAngle: 140
   currentCombatStyle: 0
   attackCooldown: 2
   meleeAttacks:
@@ -3720,8 +3717,8 @@ NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1400248248}
-  m_Enabled: 0
+  m_GameObject: {fileID: 1302185357090945}
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 1
@@ -3742,7 +3739,7 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1400248248}
+  m_GameObject: {fileID: 1302185357090945}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -3769,7 +3766,7 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1400248248}
+  m_GameObject: {fileID: 1302185357090945}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4281,6 +4278,31 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1302185357090945 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1302186489207832, guid: d31d29bd659534649b718966cbf37289, type: 3}
+  m_PrefabInstance: {fileID: 1287322777}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1949430152449188 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
+  m_PrefabInstance: {fileID: 126816878}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1342959200149749158 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
+  m_PrefabInstance: {fileID: 43613576}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3490026885532319878 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
+  m_PrefabInstance: {fileID: 1593781486}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5213014238587219353 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5213014239458159033, guid: 4d75010ad04ddce4f8f88434f2d50394, type: 3}
+  m_PrefabInstance: {fileID: 872383520}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
