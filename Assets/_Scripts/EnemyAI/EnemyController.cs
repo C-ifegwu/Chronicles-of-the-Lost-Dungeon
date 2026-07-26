@@ -2,6 +2,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
+[System.Serializable]
+public class MeleeAttackConfig
+{
+    public string triggerName;
+    [Tooltip("How many seconds to wait before this specific attack deals damage.")]
+    public float damageDelay = 0.5f;
+}
+
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour, IDamageable
 {
@@ -17,24 +25,34 @@ public class EnemyController : MonoBehaviour, IDamageable
     
     [Header("Combat Settings")]
     public CombatStyle currentCombatStyle = CombatStyle.Melee;
+    [Tooltip("How many seconds the monster waits between swings.")]
+    public float attackCooldown = 2.0f;
     
     [Header("Melee Setup (Ignore if Laser)")]
-    [Tooltip("Add all your attack trigger names here. The AI will pick one randomly.")]
-    public string[] attackTriggerNames = { "OrcAttack" };
+    public MeleeAttackConfig[] meleeAttacks; 
 
     [Header("Laser Setup (Ignore if Melee)")]
     public LineRenderer laserRenderer;
     public Transform laserOrigin;
     public float laserDuration = 0.2f;
 
-    [Header("Death Settings")]
+    [Header("Hit & Death Settings")]
+    public string hitTriggerName = "GetHit";
+    public float stunDuration = 1.0f;
     public string deathTriggerName = "Die";
+    
+    [Header("Vanish Settings")]
+    [Tooltip("Drop a dust/explosion particle prefab here (optional).")]
+    public GameObject deathVFX; 
+    [Tooltip("Time in seconds before the body is deleted from the game.")]
+    public float bodyVanishDelay = 4.0f; 
     
     [HideInInspector] public NavMeshAgent agent;
     [HideInInspector] public Animator animator;
     
     private IEnemyState currentState;
     private bool isDead = false;
+    private bool canAttack = true; 
 
     private void Start()
     {
@@ -55,7 +73,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        if (isDead) return; // Stop all logic if dead
+        if (isDead) return;
 
         if (currentState != null) currentState.UpdateState(this);
 
@@ -77,30 +95,35 @@ public class EnemyController : MonoBehaviour, IDamageable
     // --- MELEE LOGIC ---
     public void PerformMeleeAttack()
     {
-        if (animator != null && attackTriggerNames.Length > 0) 
+        if (!canAttack) return;
+        canAttack = false; 
+
+        float currentDamageDelay = 0.5f; 
+
+        if (animator != null && meleeAttacks.Length > 0) 
         {
-            // Pick a random number between 0 and the total number of attacks in the list
-            int randomIndex = Random.Range(0, attackTriggerNames.Length);
-            string chosenAttack = attackTriggerNames[randomIndex];
+            int randomIndex = Random.Range(0, meleeAttacks.Length);
+            MeleeAttackConfig chosenAttack = meleeAttacks[randomIndex];
             
-            if (!string.IsNullOrEmpty(chosenAttack))
+            if (!string.IsNullOrEmpty(chosenAttack.triggerName))
             {
-                animator.SetTrigger(chosenAttack);
+                animator.SetTrigger(chosenAttack.triggerName);
+                currentDamageDelay = chosenAttack.damageDelay; 
             }
         }
         
-        // Instant damage has been completely removed from here!
+        StartCoroutine(DamageDelayRoutine(currentDamageDelay));
+        StartCoroutine(ResetAttackRoutine());
     }
 
-    // NEW METHOD: This is called strictly by the Animation Event in the timeline
-    public void DealMeleeDamage()
+    private IEnumerator DamageDelayRoutine(float delayTime)
     {
-        if (target == null) return;
+        yield return new WaitForSeconds(delayTime);
 
-        // Make sure the King didn't dodge away during the swing!
+        if (target == null || isDead) yield break;
+
         float distanceToKing = Vector3.Distance(transform.position, target.position);
         
-        // If the King is still within hitting range (stopping distance + a small buffer)
         if (distanceToKing <= agent.stoppingDistance + 1.0f) 
         {
             IDamageable damageable = target.GetComponent<IDamageable>();
@@ -108,11 +131,21 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
     }
 
+    private IEnumerator ResetAttackRoutine()
+    {
+        yield return new WaitForSeconds(attackCooldown);
+        canAttack = true;
+    }
+
     // --- LASER LOGIC ---
     public void FireLaser()
     {
+        if (!canAttack) return;
+        canAttack = false;
+
         if (laserRenderer == null || laserOrigin == null || target == null) return;
         StartCoroutine(ShootLaserRoutine());
+        StartCoroutine(ResetAttackRoutine());
     }
 
     private IEnumerator ShootLaserRoutine()
@@ -130,17 +163,50 @@ public class EnemyController : MonoBehaviour, IDamageable
         laserRenderer.enabled = false;
     }
 
+    // --- HIT & DEATH LOGIC ---
     public void TakeDamage(int damageAmount)
     {
         if (isDead) return;
 
         currentHealth -= damageAmount;
-        if (currentHealth <= 0) Die();
+        
+        if (currentHealth <= 0) 
+        {
+            Die();
+        }
+        else
+        {
+            StopAllCoroutines();
+            
+            if (animator != null && !string.IsNullOrEmpty(hitTriggerName))
+            {
+                animator.SetTrigger(hitTriggerName);
+            }
+            
+            StartCoroutine(StunRoutine());
+        }
+    }
+
+    private IEnumerator StunRoutine()
+    {
+        if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
+        canAttack = false;
+        
+        if (laserRenderer != null) laserRenderer.enabled = false;
+
+        yield return new WaitForSeconds(stunDuration);
+
+        if (isDead) yield break;
+
+        if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
+        canAttack = true; 
     }
 
     public void Die()
     {
         isDead = true;
+        
+        StopAllCoroutines(); 
 
         if (agent != null && agent.isOnNavMesh)
         {
@@ -156,6 +222,13 @@ public class EnemyController : MonoBehaviour, IDamageable
         Collider coll = GetComponent<Collider>();
         if (coll != null) coll.enabled = false;
 
-        Destroy(gameObject, 4f); 
+        // NEW: Spawn the dust cloud if one is assigned
+        if (deathVFX != null)
+        {
+            Instantiate(deathVFX, transform.position + Vector3.up, Quaternion.identity);
+        }
+
+        // NEW: Delete the body using the custom timer
+        Destroy(gameObject, bodyVanishDelay); 
     }
 }

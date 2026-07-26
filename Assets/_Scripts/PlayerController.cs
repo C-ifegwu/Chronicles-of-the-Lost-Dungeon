@@ -18,9 +18,9 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private CharacterController characterController;
     private PlayerAnimator playerAnimator;
-    private Animator animator; // Added to access the Animator directly for the block boolean
+    private Animator animator; 
     private IAbility currentMeleeAbility;
-    private IAbility currentRangedAbility;
+    private IAbility currentSpecialAbility; // This is now wired for your shield bash!
 
     private float verticalVelocity;
 
@@ -29,10 +29,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
         characterController = GetComponent<CharacterController>();
         playerAnimator = GetComponent<PlayerAnimator>();
-        animator = GetComponent<Animator>(); // Fetch Animator for block state
+        animator = GetComponent<Animator>(); 
         
         currentMeleeAbility = GetComponent<MeleeAbility>();
-        currentRangedAbility = GetComponent<RangedAbility>();
+        currentSpecialAbility = GetComponent<SpecialAbility>(); // Grabs the new script
         
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
     }
@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     private void Update()
     {
         HandleMovement();
-        HandleDefense(); // Checks for right-click input
+        HandleDefense(); 
         HandleCombat();
     }
 
@@ -51,10 +51,9 @@ public class PlayerController : MonoBehaviour, IDamageable
         Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
 
-        // Apply real physics and gravity
         if (characterController.isGrounded)
         {
-            verticalVelocity = -0.5f; // Stick to the floor
+            verticalVelocity = -0.5f; 
             if (InputManager.Instance.JumpTriggered)
             {
                 verticalVelocity = jumpForce;
@@ -83,7 +82,6 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void HandleDefense()
     {
-        // Right-Click pressed (Shield Up)
         if (Input.GetMouseButtonDown(1)) 
         {
             isBlocking = true;
@@ -92,7 +90,6 @@ public class PlayerController : MonoBehaviour, IDamageable
                 animator.SetBool("IsBlocking", true);
             }
         }
-        // Right-Click released (Shield Down)
         else if (Input.GetMouseButtonUp(1)) 
         {
             isBlocking = false;
@@ -107,11 +104,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         if (InputManager.Instance == null) return;
 
-        // Optional: Prevent initiating new attacks while actively blocking
         if (isBlocking) return; 
 
-        if (InputManager.Instance.MeleeTriggered && currentMeleeAbility != null) currentMeleeAbility.Execute();
-        else if (InputManager.Instance.SpecialTriggered && currentRangedAbility != null) currentRangedAbility.Execute();
+        if (InputManager.Instance.MeleeTriggered && currentMeleeAbility != null) 
+            currentMeleeAbility.Execute();
+        else if (InputManager.Instance.SpecialTriggered && currentSpecialAbility != null) 
+            currentSpecialAbility.Execute(); // Triggers the special attack!
     }
 
     public void TakeDamage(int damageAmount)
@@ -119,15 +117,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         // 1. Intercept the attack if the King is blocking
         if (isBlocking)
         {
-            Debug.Log("Attack Blocked! No health lost.");
+            Debug.Log("Attack Blocked! No health lost and no flinch.");
             
-            // Trigger the visual reaction so the player feels the impact of the block
-            if (playerAnimator != null)
-            {
-                playerAnimator.TriggerHit(); 
-            }
+            // The flinch animation has been completely removed from here!
             
-            // Immediately exit the method before any health math occurs
             return; 
         }
 
@@ -151,7 +144,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         GameEvents.OnPlayerDied?.Invoke();
         Debug.Log("The King has fallen!");
         
-        // Disable this script so the dead body cannot be driven by WASD anymore
         this.enabled = false;
     }
 }

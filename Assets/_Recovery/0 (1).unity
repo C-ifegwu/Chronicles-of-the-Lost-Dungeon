@@ -171,10 +171,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: monster_orc
       objectReference: {fileID: 0}
-    - target: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1326,10 +1322,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Drakonit_monster_lod_0
       objectReference: {fileID: 0}
-    - target: {fileID: 5213014239458159033, guid: 4d75010ad04ddce4f8f88434f2d50394, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1699,10 +1691,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8858051749441068820, guid: 4c67ed6c086451b4db54ac4d24b626bb, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -1737,10 +1725,6 @@ PrefabInstance:
     - target: {fileID: 1302186489207832, guid: d31d29bd659534649b718966cbf37289, type: 3}
       propertyPath: m_Name
       value: OrkDestroyer2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1302186489207832, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 4004505470062052, guid: d31d29bd659534649b718966cbf37289, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3850,10 +3834,6 @@ PrefabInstance:
     - target: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
       propertyPath: m_Name
       value: Base mesh MonsterMutant7 skin1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 3490026887102541896, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
       propertyPath: m_LocalPosition.x

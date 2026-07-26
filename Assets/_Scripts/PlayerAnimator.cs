@@ -32,9 +32,7 @@ public class PlayerAnimator : MonoBehaviour
 
         animator.SetBool("IsBlocking", InputManager.Instance.IsBlocking);
 
-        if (InputManager.Instance.MeleeTriggered) animator.SetTrigger("MeleeAttack");
-        if (InputManager.Instance.SpecialTriggered) animator.SetTrigger("SpecialAttack");
-        
+        // Movement triggers
         if (InputManager.Instance.JumpTriggered) animator.SetTrigger("Jump");
         if (InputManager.Instance.DodgeTriggered) animator.SetTrigger("Dodge");
     }
@@ -45,6 +43,18 @@ public class PlayerAnimator : MonoBehaviour
         if (animator != null) animator.speed = globalAnimationSpeed;
     }
 
+    // --- NEW COMBAT COMMANDS ---
+    public void TriggerMelee()
+    {
+        if (animator != null) animator.SetTrigger("MeleeAttack");
+    }
+    
+    public void TriggerSpecial()
+    {
+        if (animator != null) animator.SetTrigger("SpecialAttack");
+    }
+
+    // --- REACTION COMMANDS ---
     public void TriggerHit()
     {
         if (animator != null) animator.SetTrigger("GetHit");

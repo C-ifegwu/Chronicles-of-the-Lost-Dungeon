@@ -1,15 +1,15 @@
 using UnityEngine;
 using System.Collections;
 
-public class MeleeAbility : MonoBehaviour, IAbility
+public class SpecialAbility : MonoBehaviour, IAbility
 {
-    [Header("Melee Stats")]
-    [SerializeField] private int damageAmount = 25;
-    [SerializeField] private float attackRange = 2.5f;
-    [SerializeField] private float attackAngle = 140f;
+    [Header("Special Stats (Shield Attack)")]
+    [SerializeField] private int damageAmount = 45;
+    [SerializeField] private float attackRange = 3.0f;
+    [SerializeField] private float attackAngle = 180f; // Wider hit area
     
-    [Tooltip("How many seconds to wait before the damage hits the enemy.")]
-    [SerializeField] private float damageDelay = 0.4f; // NEW DELAY VARIABLE
+    [Tooltip("Time in seconds before the shield bash hits.")]
+    [SerializeField] private float damageDelay = 0.5f;
 
     [Header("Auto-Aim / Target Lock")]
     [SerializeField] private float autoAimRadius = 6.0f;
@@ -24,17 +24,16 @@ public class MeleeAbility : MonoBehaviour, IAbility
 
     public void Execute()
     {
-        // Prevent spamming the attack button
-        if (isAttacking) return; 
+        if (isAttacking) return;
 
         AutoAimAtNearestEnemy();
 
         if (playerAnimator != null)
         {
-            playerAnimator.TriggerMelee();
+            // Triggers the "SpecialAttack" parameter you have in your screenshot
+            playerAnimator.TriggerSpecial(); 
         }
 
-        // Start the delay timer before applying damage
         StartCoroutine(DamageDelayRoutine());
     }
 
@@ -42,14 +41,11 @@ public class MeleeAbility : MonoBehaviour, IAbility
     {
         isAttacking = true;
         yield return new WaitForSeconds(damageDelay);
-        
         DetectAndDamageEnemies();
-        
-        // Cooldown before the King can swing again (adjust as needed)
-        yield return new WaitForSeconds(0.2f); 
+        yield return new WaitForSeconds(0.4f);
         isAttacking = false;
     }
-
+    
     private void AutoAimAtNearestEnemy()
     {
         Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, autoAimRadius);
@@ -73,7 +69,6 @@ public class MeleeAbility : MonoBehaviour, IAbility
         {
             Vector3 directionToEnemy = (nearestEnemy.position - transform.position).normalized;
             directionToEnemy.y = 0; 
-
             if (directionToEnemy != Vector3.zero)
             {
                 transform.rotation = Quaternion.LookRotation(directionToEnemy);
@@ -84,7 +79,6 @@ public class MeleeAbility : MonoBehaviour, IAbility
     private void DetectAndDamageEnemies()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
-
         foreach (Collider hit in hitColliders)
         {
             if (hit.CompareTag("Enemy") || hit.transform.root.CompareTag("Enemy"))
@@ -96,20 +90,9 @@ public class MeleeAbility : MonoBehaviour, IAbility
                 if (angle <= attackAngle / 2f)
                 {
                     IDamageable damageable = hit.GetComponentInParent<IDamageable>();
-                    if (damageable != null)
-                    {
-                        damageable.TakeDamage(damageAmount);
-                    }
+                    if (damageable != null) damageable.TakeDamage(damageAmount);
                 }
             }
         }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, autoAimRadius);
     }
 }
