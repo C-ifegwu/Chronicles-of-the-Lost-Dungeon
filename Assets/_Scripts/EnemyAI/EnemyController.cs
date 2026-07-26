@@ -20,12 +20,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     public int attackDamage = 10;
     private int currentHealth;
 
-    [Header("Targeting")]
-    public Transform target; 
+    [Header("Targeting & Vision")]
+    [HideInInspector] public Transform target; 
+    public float detectionRadius = 15f;
+    public float fieldOfViewAngle = 140f;
+    private Transform playerTransform;
     
     [Header("Combat Settings")]
     public CombatStyle currentCombatStyle = CombatStyle.Melee;
-    [Tooltip("How many seconds the monster waits between swings.")]
     public float attackCooldown = 2.0f;
     
     [Header("Melee Setup (Ignore if Laser)")]
@@ -42,9 +44,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public string deathTriggerName = "Die";
     
     [Header("Vanish Settings")]
-    [Tooltip("Drop a dust/explosion particle prefab here (optional).")]
     public GameObject deathVFX; 
-    [Tooltip("Time in seconds before the body is deleted from the game.")]
     public float bodyVanishDelay = 4.0f; 
     
     [HideInInspector] public NavMeshAgent agent;
@@ -62,11 +62,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (laserRenderer != null) laserRenderer.enabled = false;
 
-        if (target == null)
-        {
-            PlayerController player = FindObjectOfType<PlayerController>();
-            if (player != null) target = player.transform;
-        }
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null) playerTransform = player.transform;
 
         ChangeState(new EnemyIdleState());
     }
@@ -75,11 +72,32 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
+        if (target == null && playerTransform != null)
+        {
+            LookForKing();
+        }
+
         if (currentState != null) currentState.UpdateState(this);
 
         if (animator != null && agent != null)
         {
             animator.SetFloat("Speed", agent.velocity.magnitude);
+        }
+    }
+
+    private void LookForKing()
+    {
+        float distanceToKing = Vector3.Distance(transform.position, playerTransform.position);
+        
+        if (distanceToKing <= detectionRadius)
+        {
+            Vector3 directionToKing = (playerTransform.position - transform.position).normalized;
+            float angle = Vector3.Angle(transform.forward, directionToKing);
+
+            if (angle <= fieldOfViewAngle / 2f)
+            {
+                target = playerTransform;
+            }
         }
     }
 
@@ -92,7 +110,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         currentState.EnterState(this);
     }
 
-    // --- MELEE LOGIC ---
     public void PerformMeleeAttack()
     {
         if (!canAttack) return;
@@ -137,7 +154,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         canAttack = true;
     }
 
-    // --- LASER LOGIC ---
     public void FireLaser()
     {
         if (!canAttack) return;
@@ -163,10 +179,14 @@ public class EnemyController : MonoBehaviour, IDamageable
         laserRenderer.enabled = false;
     }
 
-    // --- HIT & DEATH LOGIC ---
     public void TakeDamage(int damageAmount)
     {
         if (isDead) return;
+
+        if (target == null && playerTransform != null)
+        {
+            target = playerTransform;
+        }
 
         currentHealth -= damageAmount;
         
@@ -205,7 +225,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void Die()
     {
         isDead = true;
-        
         StopAllCoroutines(); 
 
         if (agent != null && agent.isOnNavMesh)
@@ -222,13 +241,38 @@ public class EnemyController : MonoBehaviour, IDamageable
         Collider coll = GetComponent<Collider>();
         if (coll != null) coll.enabled = false;
 
-        // NEW: Spawn the dust cloud if one is assigned
         if (deathVFX != null)
         {
             Instantiate(deathVFX, transform.position + Vector3.up, Quaternion.identity);
         }
 
-        // NEW: Delete the body using the custom timer
         Destroy(gameObject, bodyVanishDelay); 
+    }
+    
+    // --- REALISM MECHANICS ---
+    public void HearNoise(Transform noiseSource)
+    {
+        if (isDead) return;
+        
+        if (target == null)
+        {
+            target = noiseSource;
+        }
+    }
+
+    public void ApplyKnockback(Vector3 attackerPosition, float force)
+    {
+        if (isDead || agent == null || !agent.isOnNavMesh) return;
+        
+        Vector3 pushDirection = (transform.position - attackerPosition).normalized;
+        pushDirection.y = 0; 
+        
+        agent.Move(pushDirection * force);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 }

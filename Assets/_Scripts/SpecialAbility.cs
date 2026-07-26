@@ -6,7 +6,7 @@ public class SpecialAbility : MonoBehaviour, IAbility
     [Header("Special Stats (Shield Attack)")]
     [SerializeField] private int damageAmount = 45;
     [SerializeField] private float attackRange = 3.0f;
-    [SerializeField] private float attackAngle = 180f; // Wider hit area
+    [SerializeField] private float attackAngle = 180f; 
     
     [Tooltip("Time in seconds before the shield bash hits.")]
     [SerializeField] private float damageDelay = 0.5f;
@@ -30,7 +30,6 @@ public class SpecialAbility : MonoBehaviour, IAbility
 
         if (playerAnimator != null)
         {
-            // Triggers the "SpecialAttack" parameter you have in your screenshot
             playerAnimator.TriggerSpecial(); 
         }
 
@@ -91,6 +90,9 @@ public class SpecialAbility : MonoBehaviour, IAbility
                 {
                     IDamageable damageable = hit.GetComponentInParent<IDamageable>();
                     if (damageable != null) damageable.TakeDamage(damageAmount);
+
+                    EnemyController enemy = hit.GetComponentInParent<EnemyController>();
+                    if (enemy != null) enemy.ApplyKnockback(transform.position, 4.0f);
                 }
             }
         }

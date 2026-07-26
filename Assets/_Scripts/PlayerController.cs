@@ -6,6 +6,13 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private int maxHealth = 100;
     private int currentHealth;
 
+    [Header("Stamina System")]
+    [SerializeField] private float maxStamina = 100f;
+    private float currentStamina;
+    [SerializeField] private float staminaRegenRate = 15f;
+    [SerializeField] private float meleeStaminaCost = 15f;
+    [SerializeField] private float specialStaminaCost = 40f;
+
     [Header("Defense")]
     public bool isBlocking = false;
 
@@ -20,19 +27,20 @@ public class PlayerController : MonoBehaviour, IDamageable
     private PlayerAnimator playerAnimator;
     private Animator animator; 
     private IAbility currentMeleeAbility;
-    private IAbility currentSpecialAbility; // This is now wired for your shield bash!
+    private IAbility currentSpecialAbility; 
 
     private float verticalVelocity;
 
     private void Start()
     {
         currentHealth = maxHealth;
+        currentStamina = maxStamina;
         characterController = GetComponent<CharacterController>();
         playerAnimator = GetComponent<PlayerAnimator>();
         animator = GetComponent<Animator>(); 
         
         currentMeleeAbility = GetComponent<MeleeAbility>();
-        currentSpecialAbility = GetComponent<SpecialAbility>(); // Grabs the new script
+        currentSpecialAbility = GetComponent<SpecialAbility>(); 
         
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
     }
@@ -41,6 +49,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         HandleMovement();
         HandleDefense(); 
+        HandleStamina();
         HandleCombat();
     }
 
@@ -85,46 +94,81 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (Input.GetMouseButtonDown(1)) 
         {
             isBlocking = true;
-            if (animator != null)
-            {
-                animator.SetBool("IsBlocking", true);
-            }
+            if (animator != null) animator.SetBool("IsBlocking", true);
         }
         else if (Input.GetMouseButtonUp(1)) 
         {
             isBlocking = false;
-            if (animator != null)
-            {
-                animator.SetBool("IsBlocking", false);
-            }
+            if (animator != null) animator.SetBool("IsBlocking", false);
+        }
+    }
+
+    private void HandleStamina()
+    {
+        if (!isBlocking && currentStamina < maxStamina)
+        {
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina) currentStamina = maxStamina;
         }
     }
 
     private void HandleCombat()
     {
         if (InputManager.Instance == null) return;
-
         if (isBlocking) return; 
 
-        if (InputManager.Instance.MeleeTriggered && currentMeleeAbility != null) 
-            currentMeleeAbility.Execute();
-        else if (InputManager.Instance.SpecialTriggered && currentSpecialAbility != null) 
-            currentSpecialAbility.Execute(); // Triggers the special attack!
+        if (InputManager.Instance.MeleeTriggered && currentMeleeAbility != null)
+        {
+            if (currentStamina >= meleeStaminaCost)
+            {
+                currentStamina -= meleeStaminaCost;
+                currentMeleeAbility.Execute();
+                MakeNoise(8f); 
+            }
+            else
+            {
+                Debug.Log("Not enough stamina for a melee attack!");
+            }
+        }
+        else if (InputManager.Instance.SpecialTriggered && currentSpecialAbility != null)
+        {
+            if (currentStamina >= specialStaminaCost)
+            {
+                currentStamina -= specialStaminaCost;
+                currentSpecialAbility.Execute();
+                MakeNoise(15f); 
+            }
+            else
+            {
+                Debug.Log("Not enough stamina for a shield bash!");
+            }
+        }
+    }
+
+    private void MakeNoise(float noiseRadius)
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, noiseRadius);
+        foreach (Collider col in nearbyColliders)
+        {
+            if (col.CompareTag("Enemy") || col.transform.root.CompareTag("Enemy"))
+            {
+                EnemyController enemy = col.GetComponentInParent<EnemyController>();
+                if (enemy != null)
+                {
+                    enemy.HearNoise(transform);
+                }
+            }
+        }
     }
 
     public void TakeDamage(int damageAmount)
     {
-        // 1. Intercept the attack if the King is blocking
         if (isBlocking)
         {
             Debug.Log("Attack Blocked! No health lost and no flinch.");
-            
-            // The flinch animation has been completely removed from here!
-            
             return; 
         }
 
-        // 2. Normal damage logic
         currentHealth -= damageAmount;
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
 

@@ -204,7 +204,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68324310}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -222,7 +222,9 @@ MonoBehaviour:
   laserDuration: 0.2
   hitTriggerName: GetHit
   stunDuration: 1
-  deathTriggerName: Die
+  deathTriggerName: 
+  deathVFX: {fileID: 0}
+  bodyVanishDelay: 0.1
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!195 &68324312
@@ -232,7 +234,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68324310}
-  m_Enabled: 0
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 2
@@ -545,7 +547,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
       propertyPath: m_Name
-      value: Crusader tank_prefab
+      value: King
+      objectReference: {fileID: 0}
+    - target: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4394185532969230, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
       propertyPath: m_LocalPosition.x
@@ -619,6 +625,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
       insertIndex: -1
       addedObject: {fileID: 978944094}
+    - targetCorrespondingSourceObject: {fileID: 1949430161825482, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 978944097}
   m_SourcePrefab: {fileID: 100100000, guid: 9e066cea98814aa448c70270a3c60251, type: 3}
 --- !u!1 &173107601 stripped
 GameObject:
@@ -653,6 +662,8 @@ MonoBehaviour:
   hitTriggerName: GetHit
   stunDuration: 1
   deathTriggerName: Die
+  deathVFX: {fileID: 0}
+  bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!195 &173107605
@@ -864,63 +875,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1001 &390258203
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3.4717262
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.00000020635525
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -6.4581084
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468617057500289297, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9137032837993464747, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
-      propertyPath: m_Name
-      value: URP - Giant01 - Golem
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4534b9cc6330aed499be54b02abf5283, type: 3}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1170,6 +1124,8 @@ MonoBehaviour:
   hitTriggerName: GetHit
   stunDuration: 1
   deathTriggerName: Die
+  deathVFX: {fileID: 0}
+  bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!195 &812033372
@@ -1411,6 +1367,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfbcd618a7fe2aa429f63648bcf8378c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameAssembly::MeleeAbility
+  damageAmount: 5
+  attackRange: 2
+  attackAngle: 140
+  damageDelay: 0.4
+  autoAimRadius: 3
 --- !u!114 &978944087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1512,12 +1473,12 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 1.05, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!208 &978944094
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -1534,6 +1495,23 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &978944097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978944084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f34093e407450d743be73d135aef1834, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::SpecialAbility
+  damageAmount: 45
+  attackRange: 3
+  attackAngle: 180
+  damageDelay: 0.5
+  autoAimRadius: 6
 --- !u!1 &1127552770 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
@@ -1565,6 +1543,8 @@ MonoBehaviour:
   hitTriggerName: GetHit
   stunDuration: 1
   deathTriggerName: Die
+  deathVFX: {fileID: 0}
+  bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!195 &1127552774
@@ -1649,7 +1629,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2829917917779058644, guid: 4c67ed6c086451b4db54ac4d24b626bb, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8189179709687727534, guid: 4c67ed6c086451b4db54ac4d24b626bb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3707,7 +3687,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1400248248}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
@@ -3730,6 +3710,8 @@ MonoBehaviour:
   hitTriggerName: GetHit
   stunDuration: 1
   deathTriggerName: Die
+  deathVFX: {fileID: 0}
+  bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!195 &1400248252
@@ -4317,4 +4299,3 @@ SceneRoots:
   - {fileID: 1593781486}
   - {fileID: 43613576}
   - {fileID: 872383520}
-  - {fileID: 390258203}

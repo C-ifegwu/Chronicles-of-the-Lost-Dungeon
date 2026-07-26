@@ -9,7 +9,7 @@ public class MeleeAbility : MonoBehaviour, IAbility
     [SerializeField] private float attackAngle = 140f;
     
     [Tooltip("How many seconds to wait before the damage hits the enemy.")]
-    [SerializeField] private float damageDelay = 0.4f; // NEW DELAY VARIABLE
+    [SerializeField] private float damageDelay = 0.4f;
 
     [Header("Auto-Aim / Target Lock")]
     [SerializeField] private float autoAimRadius = 6.0f;
@@ -24,7 +24,6 @@ public class MeleeAbility : MonoBehaviour, IAbility
 
     public void Execute()
     {
-        // Prevent spamming the attack button
         if (isAttacking) return; 
 
         AutoAimAtNearestEnemy();
@@ -34,7 +33,6 @@ public class MeleeAbility : MonoBehaviour, IAbility
             playerAnimator.TriggerMelee();
         }
 
-        // Start the delay timer before applying damage
         StartCoroutine(DamageDelayRoutine());
     }
 
@@ -45,7 +43,6 @@ public class MeleeAbility : MonoBehaviour, IAbility
         
         DetectAndDamageEnemies();
         
-        // Cooldown before the King can swing again (adjust as needed)
         yield return new WaitForSeconds(0.2f); 
         isAttacking = false;
     }
@@ -99,6 +96,12 @@ public class MeleeAbility : MonoBehaviour, IAbility
                     if (damageable != null)
                     {
                         damageable.TakeDamage(damageAmount);
+                    }
+
+                    EnemyController enemy = hit.GetComponentInParent<EnemyController>();
+                    if (enemy != null)
+                    {
+                        enemy.ApplyKnockback(transform.position, 1.5f);
                     }
                 }
             }
