@@ -21,6 +21,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private int currentHealth;
 
     [Header("Targeting & Vision")]
+    public float patrolRadius = 10f; // <--- ADDED: This fixes the red CS1061 errors
     [HideInInspector] public Transform target; 
     public float detectionRadius = 15f;
     public float fieldOfViewAngle = 140f;
@@ -62,7 +63,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (laserRenderer != null) laserRenderer.enabled = false;
 
-        PlayerController player = FindObjectOfType<PlayerController>();
+        // <--- UPDATED: This fixes the yellow CS0618 obsolete warning
+        PlayerController player = FindFirstObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
 
         // Swapped Idle for Patrol so enemies wander around on start!
@@ -225,6 +227,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void Die()
     {
+        if (GetComponent<BossDefeatNotifier>() != null) GetComponent<BossDefeatNotifier>().NotifyBossDefeated();
+        
         isDead = true;
         StopAllCoroutines(); 
 

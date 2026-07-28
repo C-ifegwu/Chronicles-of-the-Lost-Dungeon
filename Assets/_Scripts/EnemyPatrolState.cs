@@ -3,13 +3,18 @@ using UnityEngine.AI;
 
 public class EnemyPatrolState : IEnemyState
 {
-    private float patrolRadius = 10f; // How far they will wander from their current spot
     private float waitTime = 2.5f;    // How many seconds they stand still after reaching a point
     private float waitTimer = 0f;
     private bool isWaiting = false;
+    
+    // The anchor point so they never drift away
+    private Vector3 startPosition; 
 
     public void EnterState(EnemyController enemy)
     {
+        // Save the exact spot you placed them in the Unity Editor
+        startPosition = enemy.transform.position; 
+        
         SetNewPatrolDestination(enemy);
     }
 
@@ -18,7 +23,6 @@ public class EnemyPatrolState : IEnemyState
         // 1. CONSTANT THREAT CHECK: Did we see or hear the King?
         if (enemy.target != null)
         {
-            // Switch to your chase state (ensure this matches the exact name of your chase script!)
             enemy.ChangeState(new EnemyChaseState());
             return;
         }
@@ -46,7 +50,7 @@ public class EnemyPatrolState : IEnemyState
 
     public void ExitState(EnemyController enemy)
     {
-        // Stop walking instantly when exiting the patrol state (e.g., when chasing the King)
+        // Stop walking instantly when exiting the patrol state
         if (enemy.agent != null && enemy.agent.isOnNavMesh)
         {
             enemy.agent.ResetPath();
@@ -57,13 +61,15 @@ public class EnemyPatrolState : IEnemyState
     {
         if (enemy.agent == null || !enemy.agent.isOnNavMesh) return;
 
-        // Pick a random direction and distance
-        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-        randomDirection += enemy.transform.position;
+        // Pick a random direction using the radius you set in the Inspector
+        Vector3 randomDirection = Random.insideUnitSphere * enemy.patrolRadius;
+        
+        // Add it to the START position so they orbit their spawn point
+        randomDirection += startPosition; 
         
         NavMeshHit hit;
-        // Check if that random point is actually a walkable spot on the NavMesh floor
-        if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, 1))
+        // Check if that random point is actually a walkable spot on the NavMesh
+        if (NavMesh.SamplePosition(randomDirection, out hit, enemy.patrolRadius, 1))
         {
             enemy.agent.SetDestination(hit.position);
         }

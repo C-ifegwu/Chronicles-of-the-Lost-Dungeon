@@ -33,6 +33,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Start()
     {
+        // --- NEW: Pull max health from the StatManager if it exists ---
+        if (StatManager.Instance != null)
+        {
+            maxHealth = (int)StatManager.Instance.currentMaxHealth;
+        }
+        
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         characterController = GetComponent<CharacterController>();

@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// A simple class to represent an item the King collects
 [System.Serializable]
 public class LootItem
 {
     public string itemName;
-    public int itemValue;
+    public int itemValue; // Higher value items get sorted to the top
 
     public LootItem(string name, int value)
     {
@@ -17,26 +16,51 @@ public class LootItem
 
 public class InventorySorter : MonoBehaviour
 {
-    [Header("Test Inventory")]
+    public static InventorySorter Instance { get; private set; }
+
+    [Header("King's Inventory")]
     public List<LootItem> kingsLoot = new List<LootItem>();
+
+    private void Awake()
+    {
+        // Singleton setup so the inventory persists across all 5 levels
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {
-        // Add some dummy items for testing
+        // Adding dummy items to test the sorting algorithm
+        kingsLoot.Add(new LootItem("Basic Rations", 10));
+        kingsLoot.Add(new LootItem("Elixir of Vitality", 500));
+        kingsLoot.Add(new LootItem("Warden's Key", 1000));
         kingsLoot.Add(new LootItem("Rusty Sword", 15));
-        kingsLoot.Add(new LootItem("Gold Coin", 50));
-        kingsLoot.Add(new LootItem("Health Potion", 25));
-        kingsLoot.Add(new LootItem("Diamond Ring", 500));
-        kingsLoot.Add(new LootItem("Leather Boots", 10));
+        
         SortInventory();
     }
 
-    // You can call this from a UI button to sort the inventory instantly!
+    public void AddItem(string name, int value)
+    {
+        kingsLoot.Add(new LootItem(name, value));
+        SortInventory();
+    }
+
     public void SortInventory()
     {
-        Debug.Log("Sorting Inventory from Highest to Lowest Value...");
-        QuickSort(kingsLoot, 0, kingsLoot.Count - 1);
-        
+        Debug.Log("Sorting Inventory with Quick Sort...");
+        if (kingsLoot.Count > 0)
+        {
+            QuickSort(kingsLoot, 0, kingsLoot.Count - 1);
+        }
+
+        // Print to console to verify the sort worked
         foreach (LootItem item in kingsLoot)
         {
             Debug.Log(item.itemName + " - Value: " + item.itemValue);
@@ -48,10 +72,7 @@ public class InventorySorter : MonoBehaviour
     {
         if (low < high)
         {
-            // Find the partition index
             int pivotIndex = Partition(array, low, high);
-
-            // Recursively sort elements before and after the partition
             QuickSort(array, low, pivotIndex - 1);
             QuickSort(array, pivotIndex + 1, high);
         }
@@ -59,20 +80,18 @@ public class InventorySorter : MonoBehaviour
 
     private int Partition(List<LootItem> array, int low, int high)
     {
-        // Choose the last element's value as the pivot
         int pivotValue = array[high].itemValue;
         int i = (low - 1);
 
         for (int j = low; j < high; j++)
         {
-            // We want highest value first, so we check if it is GREATER than the pivot
+            // Sort in descending order (Highest value first)
             if (array[j].itemValue >= pivotValue)
             {
                 i++;
                 Swap(array, i, j);
             }
         }
-        
         Swap(array, i + 1, high);
         return i + 1;
     }
