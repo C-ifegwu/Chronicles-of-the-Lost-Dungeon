@@ -22,7 +22,8 @@ public class GauntletManager : MonoBehaviour
         }
     }
 
-    private void TriggerAmbush()
+    // --- CHANGED: Now public so NUnit Tests can access it ---
+    public void TriggerAmbush()
     {
         gauntletTriggered = true;
         Debug.Log("[GAUNTLET] The ambush has been triggered!");
