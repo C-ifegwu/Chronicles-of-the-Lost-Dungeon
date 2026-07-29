@@ -1,44 +1,76 @@
 using UnityEngine;
+using System.Collections;
 
 public class CellDoor : MonoBehaviour, IInteractable
 {
     [Header("Door Settings")]
-    public bool isOpen = false;
-    public float openAngle = 90f;
-    public float swingSpeed = 2f;
+    public string requiredKeyID = "WardenKey";
+    public string lockedText = "Cell locked. Find the Warden's Key.";
+    public string unlockedText = "Open Cell Door";
+    
+    [Header("Code-Based Animation")]
+    [Tooltip("How far the door moves when opened. Default moves it down into the floor.")]
+    public Vector3 slideOffset = new Vector3(0, -3.5f, 0); 
+    public float slideDuration = 1.5f;
 
-    private Quaternion closedRotation;
-    private Quaternion openRotation;
-
-    private void Start()
-    {
-        closedRotation = transform.rotation;
-        openRotation = Quaternion.Euler(transform.eulerAngles + new Vector3(0, openAngle, 0));
-    }
-
-    private void Update()
-    {
-        // Smoothly swing the door open or closed based on its state
-        Quaternion targetRotation = isOpen ? openRotation : closedRotation;
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * swingSpeed);
-    }
+    private bool isUnlocked = false;
+    private bool isOpening = false;
 
     public void Interact(PlayerController player)
     {
-        isOpen = !isOpen; // Toggle the door open/closed
-        
-        if (isOpen)
+        if (isUnlocked || isOpening) return;
+
+        // TEMPORARILY COMMENTED OUT to avoid CS0246 errors.
+        /*
+        QuickSortInventory inventory = Object.FindAnyObjectByType<QuickSortInventory>();
+        if (inventory == null || !inventory.HasItem(requiredKeyID))
         {
-            Debug.Log("Cell Door Opened!");
+            Debug.Log("You need the Warden's Key to open this!");
+            return;
         }
-        else
+        */
+
+        UnlockAndOpen();
+    }
+
+    private void UnlockAndOpen()
+    {
+        isUnlocked = true;
+        isOpening = true;
+        Debug.Log($"[CELL DOOR] Unlocked with {requiredKeyID}");
+
+        // Disable the collider so the King can walk through into the boss room
+        Collider doorCollider = GetComponent<Collider>();
+        if (doorCollider != null)
         {
-            Debug.Log("Cell Door Closed!");
+            doorCollider.enabled = false;
         }
+
+        // Start sliding the door smoothly
+        StartCoroutine(SlideDoorRoutine());
+    }
+
+    private IEnumerator SlideDoorRoutine()
+    {
+        Vector3 startPos = transform.position;
+        Vector3 endPos = transform.position + slideOffset;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < slideDuration)
+        {
+            // Lerp smoothly interpolates the position over time
+            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / slideDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+
+        // Ensure it snaps exactly to the final position when done
+        transform.position = endPos;
+        isOpening = false;
     }
 
     public string GetInteractText()
     {
-        return isOpen ? "Close Door" : "Open Cell Door";
+        return isUnlocked ? "" : lockedText;
     }
 }

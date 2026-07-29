@@ -28,12 +28,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     private Animator animator; 
     private IAbility currentMeleeAbility;
     private IAbility currentSpecialAbility; 
+    
+    // --- NEW: Tracks whatever interactable object is currently in front of the King ---
+    private IInteractable currentInteractable = null;
 
     private float verticalVelocity;
 
     private void Start()
     {
-        // --- NEW: Pull max health from the StatManager if it exists ---
         if (StatManager.Instance != null)
         {
             maxHealth = (int)StatManager.Instance.currentMaxHealth;
@@ -57,6 +59,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         HandleDefense(); 
         HandleStamina();
         HandleCombat();
+        HandleInteraction(); // --- NEW: Added to the Update loop ---
     }
 
     private void HandleMovement()
@@ -151,6 +154,18 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
+    // --- NEW: The 'F' Key interaction logic ---
+    private void HandleInteraction()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (currentInteractable != null)
+            {
+                currentInteractable.Interact(this);
+            }
+        }
+    }
+
     private void MakeNoise(float noiseRadius)
     {
         Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, noiseRadius);
@@ -195,5 +210,25 @@ public class PlayerController : MonoBehaviour, IDamageable
         Debug.Log("The King has fallen!");
         
         this.enabled = false;
+    }
+
+    // --- NEW: Trigger Detection for Interactables ---
+    private void OnTriggerEnter(Collider other)
+    {
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable != null)
+        {
+            currentInteractable = interactable;
+            Debug.Log($"Press 'F' to: {currentInteractable.GetInteractText()}");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable != null && interactable == currentInteractable)
+        {
+            currentInteractable = null;
+        }
     }
 }

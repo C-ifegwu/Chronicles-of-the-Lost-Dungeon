@@ -174,9 +174,7 @@ MonoBehaviour:
   fieldOfViewAngle: 140
   currentCombatStyle: 1
   attackCooldown: 2
-  meleeAttacks:
-  - triggerName: LeftAttack
-    damageDelay: 1
+  meleeAttacks: []
   laserRenderer: {fileID: 299478917048844665}
   laserOrigin: {fileID: 1058440685555269354}
   laserDuration: 0.2

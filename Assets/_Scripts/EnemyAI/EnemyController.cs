@@ -21,7 +21,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private int currentHealth;
 
     [Header("Targeting & Vision")]
-    public float patrolRadius = 10f; // <--- ADDED: This fixes the red CS1061 errors
+    public float patrolRadius = 10f; 
     [HideInInspector] public Transform target; 
     public float detectionRadius = 15f;
     public float fieldOfViewAngle = 140f;
@@ -63,11 +63,9 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (laserRenderer != null) laserRenderer.enabled = false;
 
-        // <--- UPDATED: This fixes the yellow CS0618 obsolete warning
-        PlayerController player = FindFirstObjectByType<PlayerController>();
+        PlayerController player = Object.FindAnyObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
 
-        // Swapped Idle for Patrol so enemies wander around on start!
         ChangeState(new EnemyPatrolState());
     }
 
@@ -227,7 +225,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void Die()
     {
+        // Triggers the Victory UI (if this is the Village Boss)
         if (GetComponent<BossDefeatNotifier>() != null) GetComponent<BossDefeatNotifier>().NotifyBossDefeated();
+        
+        // Triggers the 3D Rust Key drop (if this is the Warden Guard)
+        if (GetComponent<ItemDrop>() != null) GetComponent<ItemDrop>().DropItem();
         
         isDead = true;
         StopAllCoroutines(); 
