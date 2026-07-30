@@ -231,6 +231,13 @@ public class EnemyController : MonoBehaviour, IDamageable
         // Triggers the 3D Rust Key drop (if this is the Warden Guard)
         if (GetComponent<ItemDrop>() != null) GetComponent<ItemDrop>().DropItem();
         
+        // --- NEW: Triggers random consumable loot drop ---
+        LootDrop loot = GetComponent<LootDrop>();
+        if (loot != null)
+        {
+            loot.TryDropLoot();
+        }
+        
         isDead = true;
         StopAllCoroutines(); 
 

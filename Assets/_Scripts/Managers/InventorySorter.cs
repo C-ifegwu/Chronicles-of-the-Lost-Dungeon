@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // Required to communicate with your UI text
 
 [System.Serializable]
 public class LootItem
@@ -21,6 +22,9 @@ public class InventorySorter : MonoBehaviour
     [Header("King's Inventory")]
     public List<LootItem> kingsLoot = new List<LootItem>();
 
+    [Header("HUD Connections")]
+    public TextMeshProUGUI potionCountText; // Connect your UI text here
+
     private void Awake()
     {
         // Singleton setup so the inventory persists across all 5 levels
@@ -40,6 +44,7 @@ public class InventorySorter : MonoBehaviour
         // Adding dummy items to test the sorting algorithm
         kingsLoot.Add(new LootItem("Basic Rations", 10));
         kingsLoot.Add(new LootItem("Elixir of Vitality", 500));
+        kingsLoot.Add(new LootItem("Elixir of Vitality", 500)); // Added a second to test the UI count
         kingsLoot.Add(new LootItem("Warden's Key", 1000));
         kingsLoot.Add(new LootItem("Rusty Sword", 15));
         
@@ -60,11 +65,33 @@ public class InventorySorter : MonoBehaviour
             QuickSort(kingsLoot, 0, kingsLoot.Count - 1);
         }
 
+        // Update the HUD immediately after sorting or adding items
+        UpdatePotionUI();
+
         // Print to console to verify the sort worked
         foreach (LootItem item in kingsLoot)
         {
             Debug.Log(item.itemName + " - Value: " + item.itemValue);
         }
+    }
+
+    private void UpdatePotionUI()
+    {
+        if (potionCountText == null) return;
+
+        int potionCount = 0;
+        
+        // Count how many Elixirs are currently in the bag
+        foreach (LootItem item in kingsLoot)
+        {
+            if (item.itemName == "Elixir of Vitality")
+            {
+                potionCount++;
+            }
+        }
+
+        // Update the on-screen number
+        potionCountText.text = potionCount.ToString();
     }
 
     // --- ALGORITHM 3: QUICK SORT ---

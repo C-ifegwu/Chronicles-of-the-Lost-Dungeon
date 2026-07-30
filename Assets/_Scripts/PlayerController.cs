@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; 
 
 public class PlayerController : MonoBehaviour, IDamageable
 {
@@ -33,6 +34,9 @@ public class PlayerController : MonoBehaviour, IDamageable
     private IInteractable currentInteractable = null;
 
     private float verticalVelocity;
+    
+    // --- NEW: Camera Reference for Camera-Relative Movement ---
+    private Transform mainCameraTransform;
 
     private void Start()
     {
@@ -50,6 +54,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentSpecialAbility = GetComponent<SpecialAbility>(); 
         
+        // Find the main camera in the scene for movement calculations
+        if (Camera.main != null)
+        {
+            mainCameraTransform = Camera.main.transform;
+        }
+        
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
@@ -59,7 +69,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         HandleDefense(); 
         HandleStamina();
         HandleCombat();
-        HandleInteraction(); // --- NEW: Added to the Update loop ---
+        HandleInteraction(); 
     }
 
     private void HandleMovement()
@@ -67,8 +77,30 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (InputManager.Instance == null) return;
         
         Vector2 moveInput = InputManager.Instance.MoveInput;
-        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
+        Vector3 moveDirection = Vector3.zero;
 
+        // --- NEW: Calculate movement based on Camera direction ---
+        if (mainCameraTransform != null)
+        {
+            Vector3 cameraForward = mainCameraTransform.forward;
+            Vector3 cameraRight = mainCameraTransform.right;
+
+            // Keep the King flat on the ground so he doesn't try to fly up into the camera
+            cameraForward.y = 0;
+            cameraRight.y = 0;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+
+            // W/S moves along camera's forward, A/D moves along camera's right
+            moveDirection = cameraForward * moveInput.y + cameraRight * moveInput.x;
+        }
+        else
+        {
+            // Fallback just in case the camera is ever missing
+            moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
+        }
+
+        // --- Gravity and Jumping ---
         if (characterController.isGrounded)
         {
             verticalVelocity = -0.5f; 
@@ -82,6 +114,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             verticalVelocity -= gravity * Time.deltaTime;
         }
 
+        // --- Apply Movement ---
         if (characterController != null)
         {
             float activeSpeed = InputManager.Instance.IsSprinting ? walkSpeed * sprintMultiplier : walkSpeed;
@@ -91,6 +124,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             characterController.Move(finalMovement * Time.deltaTime);
         }
 
+        // --- Rotate the King to face where he is running ---
         if (moveDirection != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -154,7 +188,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    // --- NEW: The 'F' Key interaction logic ---
     private void HandleInteraction()
     {
         if (Input.GetKeyDown(KeyCode.F))
@@ -209,10 +242,42 @@ public class PlayerController : MonoBehaviour, IDamageable
         GameEvents.OnPlayerDied?.Invoke();
         Debug.Log("The King has fallen!");
         
+        // Disable the Character Controller so he doesn't slide around while dead
+        if (characterController != null) characterController.enabled = false;
+
+        // Start the level restart timer
+        StartCoroutine(RestartLevelRoutine());
+
+        // Disable this script so the player can't keep attacking or moving
         this.enabled = false;
     }
 
-    // --- NEW: Trigger Detection for Interactables ---
+    private System.Collections.IEnumerator RestartLevelRoutine()
+    {
+        // Wait for 3 seconds so the death animation finishes playing
+        yield return new WaitForSeconds(3.0f);
+        
+        // Reload the current active scene to try again
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+
+    // --- NEW: Consumable Stat Recovery Methods ---
+    public void Heal(int amount)
+    {
+        currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+        
+        GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public void RestoreStamina(float amount)
+    {
+        currentStamina += amount;
+        if (currentStamina > maxStamina) currentStamina = maxStamina;
+    }
+
+    // --- Trigger Detection for Interactables ---
     private void OnTriggerEnter(Collider other)
     {
         IInteractable interactable = other.GetComponent<IInteractable>();

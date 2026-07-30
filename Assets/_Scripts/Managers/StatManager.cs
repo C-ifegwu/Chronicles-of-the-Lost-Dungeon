@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI; // Required to communicate with your HUD Sliders
 
 public class StatManager : MonoBehaviour
 {
@@ -6,7 +7,14 @@ public class StatManager : MonoBehaviour
 
     [Header("King's Dynamic Stats")]
     public float currentMaxHealth = 100f;
+    public float currentHealth;
     public float currentAttackDamage = 20f;
+    public float maxStamina = 100f;
+    public float currentStamina;
+
+    [Header("HUD Connections")]
+    public Slider healthBarSlider;
+    public Slider staminaBarSlider;
 
     private void Awake()
     {
@@ -22,18 +30,74 @@ public class StatManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Permanently increases the King's maximum health pool.
-    /// </summary>
+    private void Start()
+    {
+        // Fill up health and stamina when the level starts
+        currentHealth = currentMaxHealth;
+        currentStamina = maxStamina;
+        UpdateUI();
+    }
+
+    // --- Combat Logic ---
+
+    public void TakeDamage(float damageAmount)
+    {
+        currentHealth -= damageAmount;
+        if (currentHealth < 0) currentHealth = 0;
+        
+        UpdateUI();
+        
+        if (currentHealth == 0)
+        {
+            Debug.Log("The King has fallen!");
+            // You will trigger the Defeat Screen here later
+        }
+    }
+
+    public void Heal(float healAmount)
+    {
+        currentHealth += healAmount;
+        if (currentHealth > currentMaxHealth) currentHealth = currentMaxHealth;
+        
+        UpdateUI();
+    }
+
+    public void ConsumeStamina(float amount)
+    {
+        currentStamina -= amount;
+        if (currentStamina < 0) currentStamina = 0;
+        
+        UpdateUI();
+    }
+
+    // --- UI Logic ---
+
+    private void UpdateUI()
+    {
+        // Automatically scales the slider to match the exact max health/stamina
+        if (healthBarSlider != null)
+        {
+            healthBarSlider.maxValue = currentMaxHealth;
+            healthBarSlider.value = currentHealth;
+        }
+
+        if (staminaBarSlider != null)
+        {
+            staminaBarSlider.maxValue = maxStamina;
+            staminaBarSlider.value = currentStamina;
+        }
+    }
+
+    // --- Permanent Upgrades ---
+
     public void IncreaseMaxHealth(float amount)
     {
         currentMaxHealth += amount;
+        currentHealth += amount; // Heals the King for the new extra amount
+        UpdateUI();
         Debug.Log($"[STAT UPGRADE] Max Health increased by {amount}! New Max Health: {currentMaxHealth}");
     }
 
-    /// <summary>
-    /// Permanently increases the King's base melee and special attack damage.
-    /// </summary>
     public void IncreaseAttackDamage(float amount)
     {
         currentAttackDamage += amount;

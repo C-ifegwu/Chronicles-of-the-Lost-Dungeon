@@ -1862,6 +1862,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameAssembly::EnemyController
   maxHealth: 50
   attackDamage: 10
+  patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
   fieldOfViewAngle: 140
@@ -1878,7 +1879,7 @@ MonoBehaviour:
   hitTriggerName: GetHit
   stunDuration: 1
   deathTriggerName: Die
-  deathVFX: {fileID: 0}
+  deathVFX: {fileID: 8378648546881499446, guid: 867c572a5be680d42a042d2349f10143, type: 3}
   bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}

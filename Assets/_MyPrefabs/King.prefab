@@ -6580,7 +6580,7 @@ MonoBehaviour:
   damageAmount: 5
   attackRange: 2
   attackAngle: 140
-  damageDelay: 0.4
+  damageDelay: 0.5
   autoAimRadius: 3
 --- !u!114 &9212803022839768038
 MonoBehaviour:

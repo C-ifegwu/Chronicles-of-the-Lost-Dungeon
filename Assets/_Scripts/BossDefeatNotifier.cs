@@ -4,21 +4,24 @@ public class BossDefeatNotifier : MonoBehaviour
 {
     private bool isDefeated = false;
 
-    // You will call this method when the monster's health reaches 0
     public void NotifyBossDefeated()
     {
         if (isDefeated) return;
         
         isDefeated = true;
-        Debug.Log("Boss defeated! Triggering Victory UI...");
+        Debug.Log("[BOSS] Skeleton defeated! Searching for Victory Manager...");
         
-        if (VictoryManager.Instance != null)
+        // Actively search the current scene for the VictoryManager
+        VictoryManager victoryManager = Object.FindFirstObjectByType<VictoryManager>();
+        
+        if (victoryManager != null)
         {
-            VictoryManager.Instance.OnLevelCompleted();
+            Debug.Log("[BOSS] Victory Manager found! Spawning portal...");
+            victoryManager.OnLevelCompleted();
         }
         else
         {
-            Debug.LogWarning("VictoryManager is missing in the scene!");
+            Debug.LogError("[BOSS FATAL ERROR] No VictoryManager found in the scene! Did you delete it?");
         }
     }
 }
