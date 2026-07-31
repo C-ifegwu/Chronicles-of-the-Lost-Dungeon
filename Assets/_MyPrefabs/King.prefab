@@ -6543,9 +6543,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameAssembly::PlayerController
   maxHealth: 100
   maxStamina: 100
-  staminaRegenRate: 15
+  staminaRegenRate: 5
   meleeStaminaCost: 15
   specialStaminaCost: 40
+  staminaRegenDelay: 2
   isBlocking: 0
   walkSpeed: 2
   sprintMultiplier: 1

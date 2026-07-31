@@ -10,9 +10,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Header("Stamina System")]
     [SerializeField] private float maxStamina = 100f;
     private float currentStamina;
-    [SerializeField] private float staminaRegenRate = 15f;
+    [SerializeField] private float staminaRegenRate = 10f; // Adjusted for better pacing
     [SerializeField] private float meleeStaminaCost = 15f;
     [SerializeField] private float specialStaminaCost = 40f;
+    
+    // --- NEW: Exhaustion Delay Variables ---
+    [Tooltip("How many seconds to wait after an attack before stamina starts recovering.")]
+    [SerializeField] private float staminaRegenDelay = 1.2f; 
+    private float regenTimer = 0f;
 
     [Header("Defense")]
     public bool isBlocking = false;
@@ -30,12 +35,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     private IAbility currentMeleeAbility;
     private IAbility currentSpecialAbility; 
     
-    // --- NEW: Tracks whatever interactable object is currently in front of the King ---
     private IInteractable currentInteractable = null;
-
     private float verticalVelocity;
-    
-    // --- NEW: Camera Reference for Camera-Relative Movement ---
     private Transform mainCameraTransform;
 
     private void Start()
@@ -54,7 +55,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentSpecialAbility = GetComponent<SpecialAbility>(); 
         
-        // Find the main camera in the scene for movement calculations
         if (Camera.main != null)
         {
             mainCameraTransform = Camera.main.transform;
@@ -70,6 +70,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         HandleStamina();
         HandleCombat();
         HandleInteraction(); 
+
+        // Forces the StatManager to mirror the King's internal math
+        if (StatManager.Instance != null)
+        {
+            StatManager.Instance.currentHealth = this.currentHealth;
+            StatManager.Instance.currentStamina = this.currentStamina;
+        }
     }
 
     private void HandleMovement()
@@ -79,28 +86,23 @@ public class PlayerController : MonoBehaviour, IDamageable
         Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
 
-        // --- NEW: Calculate movement based on Camera direction ---
         if (mainCameraTransform != null)
         {
             Vector3 cameraForward = mainCameraTransform.forward;
             Vector3 cameraRight = mainCameraTransform.right;
 
-            // Keep the King flat on the ground so he doesn't try to fly up into the camera
             cameraForward.y = 0;
             cameraRight.y = 0;
             cameraForward.Normalize();
             cameraRight.Normalize();
 
-            // W/S moves along camera's forward, A/D moves along camera's right
             moveDirection = cameraForward * moveInput.y + cameraRight * moveInput.x;
         }
         else
         {
-            // Fallback just in case the camera is ever missing
             moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
         }
 
-        // --- Gravity and Jumping ---
         if (characterController.isGrounded)
         {
             verticalVelocity = -0.5f; 
@@ -114,7 +116,6 @@ public class PlayerController : MonoBehaviour, IDamageable
             verticalVelocity -= gravity * Time.deltaTime;
         }
 
-        // --- Apply Movement ---
         if (characterController != null)
         {
             float activeSpeed = InputManager.Instance.IsSprinting ? walkSpeed * sprintMultiplier : walkSpeed;
@@ -124,7 +125,6 @@ public class PlayerController : MonoBehaviour, IDamageable
             characterController.Move(finalMovement * Time.deltaTime);
         }
 
-        // --- Rotate the King to face where he is running ---
         if (moveDirection != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -148,6 +148,13 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void HandleStamina()
     {
+        // --- NEW: Tick down the exhaustion timer first ---
+        if (regenTimer > 0)
+        {
+            regenTimer -= Time.deltaTime;
+            return; // Exit the method so no stamina is recovered this frame
+        }
+
         if (!isBlocking && currentStamina < maxStamina)
         {
             currentStamina += staminaRegenRate * Time.deltaTime;
@@ -165,6 +172,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (currentStamina >= meleeStaminaCost)
             {
                 currentStamina -= meleeStaminaCost;
+                regenTimer = staminaRegenDelay; // --- NEW: Reset the delay timer ---
                 currentMeleeAbility.Execute();
                 MakeNoise(8f); 
             }
@@ -178,23 +186,13 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (currentStamina >= specialStaminaCost)
             {
                 currentStamina -= specialStaminaCost;
+                regenTimer = staminaRegenDelay; // --- NEW: Reset the delay timer ---
                 currentSpecialAbility.Execute();
                 MakeNoise(15f); 
             }
             else
             {
                 Debug.Log("Not enough stamina for a shield bash!");
-            }
-        }
-    }
-
-    private void HandleInteraction()
-    {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            if (currentInteractable != null)
-            {
-                currentInteractable.Interact(this);
             }
         }
     }
@@ -242,27 +240,21 @@ public class PlayerController : MonoBehaviour, IDamageable
         GameEvents.OnPlayerDied?.Invoke();
         Debug.Log("The King has fallen!");
         
-        // Disable the Character Controller so he doesn't slide around while dead
         if (characterController != null) characterController.enabled = false;
 
-        // Start the level restart timer
         StartCoroutine(RestartLevelRoutine());
 
-        // Disable this script so the player can't keep attacking or moving
         this.enabled = false;
     }
 
     private System.Collections.IEnumerator RestartLevelRoutine()
     {
-        // Wait for 3 seconds so the death animation finishes playing
         yield return new WaitForSeconds(3.0f);
         
-        // Reload the current active scene to try again
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
     }
 
-    // --- NEW: Consumable Stat Recovery Methods ---
     public void Heal(int amount)
     {
         currentHealth += amount;
@@ -277,14 +269,39 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (currentStamina > maxStamina) currentStamina = maxStamina;
     }
 
-    // --- Trigger Detection for Interactables ---
+    // --- ONLY THE THREE METHODS BELOW WERE CHANGED ---
+
+    private void HandleInteraction()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (currentInteractable != null)
+            {
+                currentInteractable.Interact(this);
+                
+                // Hide the UI banner once the item is picked up/used
+                if (InteractionPromptUI.Instance != null)
+                {
+                    InteractionPromptUI.Instance.HidePrompt();
+                }
+                
+                currentInteractable = null;
+            }
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         IInteractable interactable = other.GetComponent<IInteractable>();
         if (interactable != null)
         {
             currentInteractable = interactable;
-            Debug.Log($"Press 'F' to: {currentInteractable.GetInteractText()}");
+            
+            // Send the interact text to your UI banner instead of the console
+            if (InteractionPromptUI.Instance != null)
+            {
+                InteractionPromptUI.Instance.ShowPrompt($"Press 'F' to: {currentInteractable.GetInteractText()}");
+            }
         }
     }
 
@@ -294,6 +311,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (interactable != null && interactable == currentInteractable)
         {
             currentInteractable = null;
+            
+            // Hide the UI banner when the King walks away from the item
+            if (InteractionPromptUI.Instance != null)
+            {
+                InteractionPromptUI.Instance.HidePrompt();
+            }
         }
     }
 }

@@ -1,17 +1,22 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(Collider))]
 public class LevelPortal : MonoBehaviour
 {
-    [Header("Destination")]
-    public string nextSceneName;
+    [Header("Portal Settings")]
+    // variable For VictoryManager 
+    public string nextSceneName; 
 
     private void OnTriggerEnter(Collider other)
     {
+        // When the King touches the portal
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Entering Portal... Loading " + nextSceneName);
-            SceneManager.LoadScene(nextSceneName);
+            // Turn on the Victory Screen and pause the game
+            if (GameOverlayManager.Instance != null)
+            {
+                GameOverlayManager.Instance.TriggerVictory();
+            }
         }
     }
 }

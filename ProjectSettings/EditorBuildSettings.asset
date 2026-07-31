@@ -6,7 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Scenes/_Preload.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_Scenes/MainMenu_Scene.unity
+    guid: 238b130a01233ee4c88ca304019c916f
+  - enabled: 1
+    path: Assets/_Scenes/Level1_TrainingPit.unity
+    guid: 778cf4e57bc74a842a2ad704ef80a10d
+  - enabled: 1
+    path: Assets/_Scenes/Level2_Dungeons.unity
+    guid: cb738379f48032848a8a019ae0cec9c9
+  - enabled: 1
+    path: Assets/_Scenes/Level3_PrisonRooftop.unity
+    guid: d9cb05809e25ac34682519a443290029
+  - enabled: 1
+    path: Assets/_Scenes/Level4_Ward.unity
+    guid: 8583c974c4edffb46b43b1d7a9e300bf
+  - enabled: 1
+    path: Assets/_Scenes/Level5_ThroneRoom.unity
+    guid: 8ae2b9423427c9a4a95f79f483a65f98
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 8bcc7147642c4db4e852f797f229d28e, type: 3}

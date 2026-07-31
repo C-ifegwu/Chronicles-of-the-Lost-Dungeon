@@ -5,10 +5,10 @@ public class VictoryManager : MonoBehaviour
     public static VictoryManager Instance { get; private set; }
 
     [Header("UI & Portal Settings")]
-    public GameObject victoryCanvas;
+    public GameObject victoryCanvas; // You can leave this blank in the Inspector!
     public GameObject portalPrefab;
     public Transform portalSpawnPoint;
-    public string nextLevelName;
+    public string nextLevelName = "Level2_Dungeons";
 
     private void Awake()
     {
@@ -22,32 +22,10 @@ public class VictoryManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        if (victoryCanvas != null)
-        {
-            victoryCanvas.SetActive(false);
-        }
-    }
-
-    // Call this method when the level boss/challenge is defeated
+    // Called by the BossDefeatNotifier when the skeleton's health hits 0
     public void OnLevelCompleted()
     {
-        Debug.Log("Level Objective Complete!");
-        if (victoryCanvas != null)
-        {
-            victoryCanvas.SetActive(true);
-        }
-    }
-
-    // Assign this method to the "Proceed" Button OnClick() listener in the Inspector
-    public void OnProceedButtonClicked()
-    {
-        if (victoryCanvas != null)
-        {
-            victoryCanvas.SetActive(false);
-        }
-
+        Debug.Log("Level Objective Complete! Spawning portal now...");
         SpawnPortal();
     }
 
@@ -55,6 +33,7 @@ public class VictoryManager : MonoBehaviour
     {
         if (portalPrefab != null && portalSpawnPoint != null)
         {
+            // Spawns the portal into the 3D world
             GameObject portalInstance = Instantiate(portalPrefab, portalSpawnPoint.position, portalSpawnPoint.rotation);
             LevelPortal portalScript = portalInstance.GetComponent<LevelPortal>();
             

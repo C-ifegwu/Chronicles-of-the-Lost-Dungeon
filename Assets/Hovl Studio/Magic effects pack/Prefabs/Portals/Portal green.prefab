@@ -9751,7 +9751,7 @@ GameObject:
   - component: {fileID: 1117241510088844932}
   - component: {fileID: 6116939183738836120}
   - component: {fileID: 1042843224701684731}
-  - component: {fileID: 2084955356289392576}
+  - component: {fileID: 6332136340547664593}
   m_Layer: 0
   m_Name: Portal green
   m_TagString: Untagged
@@ -14659,7 +14659,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.954608, y: 2.841, z: 0.909191}
   m_Center: {x: -0.015807271, y: 0.00049996376, z: -0.11684579}
---- !u!114 &2084955356289392576
+--- !u!114 &6332136340547664593
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14668,9 +14668,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3992058561654064293}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9f36539d054ace46a72ce14bcac0bdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 24b22331c0563c446890924cea7778c4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameAssembly::PortalTransition
+  m_EditorClassIdentifier: GameAssembly::LevelPortal
+  nextSceneName: 
 --- !u!1 &6275681469945861091
 GameObject:
   m_ObjectHideFlags: 0

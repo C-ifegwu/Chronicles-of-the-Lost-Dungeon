@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 3456900386385812202}
   - component: {fileID: 7790768262885440738}
   - component: {fileID: 5779621565518933847}
+  - component: {fileID: 5356894259910474664}
   m_Layer: 0
   m_Name: monster_orc
   m_TagString: Enemy
@@ -156,6 +157,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameAssembly::EnemyController
   maxHealth: 50
   attackDamage: 10
+  bossUI: {fileID: 0}
+  floatingUI: {fileID: 0}
   patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
@@ -200,6 +203,22 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.99, z: 0}
+--- !u!114 &5356894259910474664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113492406292737456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89996c720a305ba48ab4585ecf8d9e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::BossEnemy
+  bossName: Orc
+  bossUIContainer: {fileID: 0}
+  bossHealthBar: {fileID: 0}
+  bossNameText: {fileID: 0}
 --- !u!1 &130390988292422359
 GameObject:
   m_ObjectHideFlags: 0

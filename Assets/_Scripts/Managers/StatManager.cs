@@ -38,6 +38,12 @@ public class StatManager : MonoBehaviour
         UpdateUI();
     }
 
+    // --- NEW: The Missing Engine! This forces the UI to continuously match the King's math ---
+    private void Update()
+    {
+        UpdateUI();
+    }
+
     // --- Combat Logic ---
 
     public void TakeDamage(float damageAmount)
@@ -50,7 +56,12 @@ public class StatManager : MonoBehaviour
         if (currentHealth == 0)
         {
             Debug.Log("The King has fallen!");
-            // You will trigger the Defeat Screen here later
+            
+            // Trigger the Defeat Screen
+            if (GameOverlayManager.Instance != null)
+            {
+                GameOverlayManager.Instance.TriggerDefeat();
+            }
         }
     }
 

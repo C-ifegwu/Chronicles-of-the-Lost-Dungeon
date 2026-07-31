@@ -20,6 +20,15 @@ public class EnemyController : MonoBehaviour, IDamageable
     public int attackDamage = 10;
     private int currentHealth;
 
+    [Header("UI Bridge")]
+    public BossEnemy bossUI;
+    public FloatingHealthBar floatingUI;
+    // --- NEW: Foolproof slot for the Boss Defeat Notifier ---
+    public BossDefeatNotifier bossNotifier; 
+
+    [Header("Damage Popups")]
+    public GameObject damagePopupPrefab;
+
     [Header("Targeting & Vision")]
     public float patrolRadius = 10f; 
     [HideInInspector] public Transform target; 
@@ -40,7 +49,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float laserDuration = 0.2f;
 
     [Header("Hit & Death Settings")]
-    public string hitTriggerName = "GetHit";
+    public string hitTriggerName = ""; // Left blank to prevent the yellow console warning
     public float stunDuration = 1.0f;
     public string deathTriggerName = "Die";
     
@@ -65,6 +74,24 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         PlayerController player = Object.FindAnyObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
+
+        // --- AUTO-LINK UI REFERENCES FOR MULTI-SCENE PREFABS ---
+        if (bossUI == null)
+        {
+            bossUI = Object.FindAnyObjectByType<BossEnemy>();
+        }
+        if (floatingUI == null)
+        {
+            floatingUI = GetComponentInChildren<FloatingHealthBar>() ?? Object.FindAnyObjectByType<FloatingHealthBar>();
+        }
+        if (bossNotifier == null)
+        {
+            bossNotifier = GetComponent<BossDefeatNotifier>() ?? Object.FindAnyObjectByType<BossDefeatNotifier>();
+        }
+        // -------------------------------------------------------
+
+        if (bossUI != null) bossUI.ActivateBossUI(maxHealth);
+        if (floatingUI != null) floatingUI.UpdateHealth(maxHealth, maxHealth);
 
         ChangeState(new EnemyPatrolState());
     }
@@ -142,7 +169,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         float distanceToKing = Vector3.Distance(transform.position, target.position);
         
-        if (distanceToKing <= agent.stoppingDistance + 1.0f) 
+        // --- INCREASED RANGE: Bypasses the collider bump so the hit actually registers! ---
+        if (distanceToKing <= agent.stoppingDistance + 3.0f) 
         {
             IDamageable damageable = target.GetComponent<IDamageable>();
             if (damageable != null) damageable.TakeDamage(attackDamage);
@@ -191,6 +219,21 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         currentHealth -= damageAmount;
         
+        if (bossUI != null) bossUI.UpdateHealthBar(currentHealth);
+        if (floatingUI != null) floatingUI.UpdateHealth(currentHealth, maxHealth);
+
+        if (damagePopupPrefab != null)
+        {
+            Vector3 spawnPosition = transform.position + Vector3.up * 2f; 
+            GameObject popup = Instantiate(damagePopupPrefab, spawnPosition, Quaternion.identity);
+            
+            DamagePopUp popupScript = popup.GetComponent<DamagePopUp>();
+            if (popupScript != null)
+            {
+                popupScript.Setup(damageAmount);
+            }
+        }
+        
         if (currentHealth <= 0) 
         {
             Die();
@@ -225,13 +268,19 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void Die()
     {
-        // Triggers the Victory UI (if this is the Village Boss)
-        if (GetComponent<BossDefeatNotifier>() != null) GetComponent<BossDefeatNotifier>().NotifyBossDefeated();
+        if (bossUI != null) 
+        {
+            bossUI.HideBossUI();
+        }
+
+        // --- NEW: Foolproof trigger that bypasses the GetComponent quirk ---
+        if (bossNotifier != null) 
+        {
+            bossNotifier.NotifyBossDefeated();
+        }
         
-        // Triggers the 3D Rust Key drop (if this is the Warden Guard)
         if (GetComponent<ItemDrop>() != null) GetComponent<ItemDrop>().DropItem();
         
-        // --- NEW: Triggers random consumable loot drop ---
         LootDrop loot = GetComponent<LootDrop>();
         if (loot != null)
         {
@@ -263,7 +312,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         Destroy(gameObject, bodyVanishDelay); 
     }
     
-    // --- REALISM MECHANICS ---
     public void HearNoise(Transform noiseSource)
     {
         if (isDead) return;

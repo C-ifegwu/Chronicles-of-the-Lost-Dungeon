@@ -3748,6 +3748,7 @@ GameObject:
   - component: {fileID: 5365029339295305458}
   - component: {fileID: 7919582956578241127}
   - component: {fileID: 2974119435988837210}
+  - component: {fileID: 2709416329687565855}
   m_Layer: 0
   m_Name: Base mesh MonsterMutant7 skin1
   m_TagString: Enemy
@@ -3831,6 +3832,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameAssembly::EnemyController
   maxHealth: 50
   attackDamage: 10
+  bossUI: {fileID: 0}
+  floatingUI: {fileID: 0}
   patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
@@ -3900,6 +3903,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2709416329687565855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5292434518981976644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89996c720a305ba48ab4585ecf8d9e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::BossEnemy
+  bossName: Monster Mutant
+  bossUIContainer: {fileID: 0}
+  bossHealthBar: {fileID: 0}
+  bossNameText: {fileID: 0}
 --- !u!1 &5370889213497751911
 GameObject:
   m_ObjectHideFlags: 0

@@ -1730,6 +1730,7 @@ GameObject:
   - component: {fileID: 8399641015561819520}
   - component: {fileID: 3911279895020799648}
   - component: {fileID: 1087255234122764712}
+  - component: {fileID: 7459280589117218645}
   m_Layer: 0
   m_Name: Drakonit_monster_lod_0
   m_TagString: Enemy
@@ -1862,6 +1863,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameAssembly::EnemyController
   maxHealth: 50
   attackDamage: 10
+  bossUI: {fileID: 0}
+  floatingUI: {fileID: 0}
   patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
@@ -1883,6 +1886,22 @@ MonoBehaviour:
   bodyVanishDelay: 4
   agent: {fileID: 0}
   animator: {fileID: 0}
+--- !u!114 &7459280589117218645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5606888124085123602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89996c720a305ba48ab4585ecf8d9e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::BossEnemy
+  bossName: Drakonight
+  bossUIContainer: {fileID: 0}
+  bossHealthBar: {fileID: 0}
+  bossNameText: {fileID: 0}
 --- !u!1 &5652127768393275257
 GameObject:
   m_ObjectHideFlags: 0

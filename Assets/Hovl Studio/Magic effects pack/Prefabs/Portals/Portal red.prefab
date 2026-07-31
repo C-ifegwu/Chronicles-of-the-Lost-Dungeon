@@ -4857,7 +4857,7 @@ GameObject:
   - component: {fileID: 8715761903829094485}
   - component: {fileID: 2564269725737345609}
   - component: {fileID: 5015670721692651622}
-  - component: {fileID: 5973777664149494296}
+  - component: {fileID: 5111903919667251925}
   m_Layer: 0
   m_Name: Portal red
   m_TagString: Untagged
@@ -9765,7 +9765,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.9334496, y: 2.841, z: 0.7322128}
   m_Center: {x: 0.11510056, y: 0.00049996376, z: 0.027479216}
---- !u!114 &5973777664149494296
+--- !u!114 &5111903919667251925
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9774,9 +9774,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4617036660772024948}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9f36539d054ace46a72ce14bcac0bdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 24b22331c0563c446890924cea7778c4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameAssembly::PortalTransition
+  m_EditorClassIdentifier: GameAssembly::LevelPortal
+  nextSceneName: Level3_PrisonRooftop
 --- !u!1 &6842134302800741127
 GameObject:
   m_ObjectHideFlags: 0

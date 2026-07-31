@@ -9,8 +9,17 @@ public class MainMenuManager : MonoBehaviour
 
     public void AwakenGame()
     {
-        // Loads the main dungeon level directly
-        SceneManager.LoadScene("Level1_Dungeon"); 
+        // Call the unkillable loading screen manager to start the black screen sequence
+        if (SceneTransitionManager.Instance != null)
+        {
+            // Make sure this name exactly matches your first level's file name!
+            SceneTransitionManager.Instance.LoadNextLevel("Level1_TrainingPit"); 
+        }
+        else
+        {
+            Debug.LogError("Loading Screen Manager is missing! Loading instantly as fallback.");
+            SceneManager.LoadScene("Level1_TrainingPit"); 
+        }
     }
 
     public void OpenChronicles()

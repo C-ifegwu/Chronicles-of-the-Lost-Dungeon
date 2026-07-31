@@ -12,7 +12,7 @@ public class BossDefeatNotifier : MonoBehaviour
         Debug.Log("[BOSS] Skeleton defeated! Searching for Victory Manager...");
         
         // Actively search the current scene for the VictoryManager
-        VictoryManager victoryManager = Object.FindFirstObjectByType<VictoryManager>();
+        VictoryManager victoryManager = Object.FindAnyObjectByType<VictoryManager>();
         
         if (victoryManager != null)
         {
