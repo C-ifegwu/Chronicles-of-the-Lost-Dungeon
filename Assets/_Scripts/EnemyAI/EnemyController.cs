@@ -23,7 +23,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("UI Bridge")]
     public BossEnemy bossUI;
     public FloatingHealthBar floatingUI;
-    // --- NEW: Foolproof slot for the Boss Defeat Notifier ---
     public BossDefeatNotifier bossNotifier; 
 
     [Header("Damage Popups")]
@@ -49,13 +48,20 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float laserDuration = 0.2f;
 
     [Header("Hit & Death Settings")]
-    public string hitTriggerName = ""; // Left blank to prevent the yellow console warning
+    public string hitTriggerName = ""; 
     public float stunDuration = 1.0f;
     public string deathTriggerName = "Die";
     
     [Header("Vanish Settings")]
     public GameObject deathVFX; 
     public float bodyVanishDelay = 4.0f; 
+
+    // --- NEW: Enemy 3D Audio Setup ---
+    [Header("Enemy Audio")]
+    public AudioSource enemyAudioSource;
+    public AudioClip attackRoarSound;
+    public AudioClip hurtSound;
+    public AudioClip deathSound;
     
     [HideInInspector] public NavMeshAgent agent;
     [HideInInspector] public Animator animator;
@@ -75,7 +81,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         PlayerController player = Object.FindAnyObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
 
-        // --- AUTO-LINK UI REFERENCES FOR MULTI-SCENE PREFABS ---
         if (bossUI == null)
         {
             bossUI = Object.FindAnyObjectByType<BossEnemy>();
@@ -88,7 +93,12 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             bossNotifier = GetComponent<BossDefeatNotifier>() ?? Object.FindAnyObjectByType<BossDefeatNotifier>();
         }
-        // -------------------------------------------------------
+
+        // --- NEW: Auto-configure 3D Audio Source ---
+        if (enemyAudioSource == null) enemyAudioSource = GetComponent<AudioSource>();
+        if (enemyAudioSource == null) enemyAudioSource = gameObject.AddComponent<AudioSource>();
+        enemyAudioSource.playOnAwake = false;
+        enemyAudioSource.spatialBlend = 1f; // Forces the sound into 3D space
 
         if (bossUI != null) bossUI.ActivateBossUI(maxHealth);
         if (floatingUI != null) floatingUI.UpdateHealth(maxHealth, maxHealth);
@@ -143,6 +153,12 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (!canAttack) return;
         canAttack = false; 
 
+        // --- NEW: Play Attack Roar ---
+        if (enemyAudioSource != null && attackRoarSound != null)
+        {
+            enemyAudioSource.PlayOneShot(attackRoarSound);
+        }
+
         float currentDamageDelay = 0.5f; 
 
         if (animator != null && meleeAttacks.Length > 0) 
@@ -169,7 +185,6 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         float distanceToKing = Vector3.Distance(transform.position, target.position);
         
-        // --- INCREASED RANGE: Bypasses the collider bump so the hit actually registers! ---
         if (distanceToKing <= agent.stoppingDistance + 3.0f) 
         {
             IDamageable damageable = target.GetComponent<IDamageable>();
@@ -187,6 +202,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (!canAttack) return;
         canAttack = false;
+
+        // --- NEW: Play Attack Roar for Laser ---
+        if (enemyAudioSource != null && attackRoarSound != null)
+        {
+            enemyAudioSource.PlayOneShot(attackRoarSound);
+        }
 
         if (laserRenderer == null || laserOrigin == null || target == null) return;
         StartCoroutine(ShootLaserRoutine());
@@ -240,6 +261,12 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
         else
         {
+            // --- NEW: Play Hurt Sound ---
+            if (enemyAudioSource != null && hurtSound != null)
+            {
+                enemyAudioSource.PlayOneShot(hurtSound);
+            }
+
             StopAllCoroutines();
             
             if (animator != null && !string.IsNullOrEmpty(hitTriggerName))
@@ -268,12 +295,24 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void Die()
     {
+        // --- NEW: Play Death Sound ---
+        if (enemyAudioSource != null && deathSound != null)
+        {
+            enemyAudioSource.PlayOneShot(deathSound);
+        }
+
+        // --- NEW: Notify Victory Manager that an enemy was slain! ---
+        if (VictoryManager.Instance != null)
+        {
+            VictoryManager.Instance.AddEnemyKilled();
+        }
+        // ------------------------------------------------------------
+
         if (bossUI != null) 
         {
             bossUI.HideBossUI();
         }
 
-        // --- NEW: Foolproof trigger that bypasses the GetComponent quirk ---
         if (bossNotifier != null) 
         {
             bossNotifier.NotifyBossDefeated();

@@ -6676,6 +6676,7 @@ GameObject:
   - component: {fileID: 3773692539346636922}
   - component: {fileID: 5171439633830164425}
   - component: {fileID: 2384590942939219392}
+  - component: {fileID: 2597308130760238332}
   m_Layer: 0
   m_Name: OrkDestroyer2
   m_TagString: Enemy
@@ -6766,10 +6767,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameAssembly::EnemyController
-  maxHealth: 50
+  maxHealth: 200
   attackDamage: 10
   bossUI: {fileID: 0}
   floatingUI: {fileID: 0}
+  bossNotifier: {fileID: 0}
+  damagePopupPrefab: {fileID: 0}
   patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
@@ -6791,6 +6794,10 @@ MonoBehaviour:
   deathTriggerName: Die
   deathVFX: {fileID: 8378648546881499446, guid: 867c572a5be680d42a042d2349f10143, type: 3}
   bodyVanishDelay: 4
+  enemyAudioSource: {fileID: 0}
+  attackRoarSound: {fileID: 8300000, guid: 9a2d033f7760b4ef09400945a538ccd9, type: 3}
+  hurtSound: {fileID: 8300000, guid: c55fb47f6865f480c989e8407de1d19c, type: 3}
+  deathSound: {fileID: 8300000, guid: ec834e3a0a9a041e58e015c0bf39ed52, type: 3}
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!136 &3773692539346636922
@@ -6859,6 +6866,19 @@ MonoBehaviour:
   bossUIContainer: {fileID: 0}
   bossHealthBar: {fileID: 0}
   bossNameText: {fileID: 0}
+--- !u!114 &2597308130760238332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7645072097207729385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad192c1793b578479024eb858195573, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::BossDefeatNotifier
+  victoryFanfare: {fileID: 8300000, guid: 4dbfbd1a56081db4ca174255a4d56b1f, type: 3}
 --- !u!1 &7665116983937184060
 GameObject:
   m_ObjectHideFlags: 0

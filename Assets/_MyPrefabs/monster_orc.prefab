@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 7790768262885440738}
   - component: {fileID: 5779621565518933847}
   - component: {fileID: 5356894259910474664}
+  - component: {fileID: 5900922793283613069}
   m_Layer: 0
   m_Name: monster_orc
   m_TagString: Enemy
@@ -155,10 +156,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 511a058177f1084409e5754be01ef935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameAssembly::EnemyController
-  maxHealth: 50
-  attackDamage: 10
+  maxHealth: 300
+  attackDamage: 15
   bossUI: {fileID: 0}
   floatingUI: {fileID: 0}
+  bossNotifier: {fileID: 0}
+  damagePopupPrefab: {fileID: 0}
   patrolRadius: 10
   target: {fileID: 0}
   detectionRadius: 15
@@ -178,6 +181,10 @@ MonoBehaviour:
   deathTriggerName: Die
   deathVFX: {fileID: 8378648546881499446, guid: 867c572a5be680d42a042d2349f10143, type: 3}
   bodyVanishDelay: 4
+  enemyAudioSource: {fileID: 0}
+  attackRoarSound: {fileID: 8300000, guid: 228a434ca9f954909a9176e45f877eaa, type: 3}
+  hurtSound: {fileID: 8300000, guid: 093a5dc60018d476791de718279859f3, type: 3}
+  deathSound: {fileID: 8300000, guid: d5799252a63954428bb39f05951b9ee0, type: 3}
   agent: {fileID: 0}
   animator: {fileID: 0}
 --- !u!136 &5779621565518933847
@@ -219,6 +226,19 @@ MonoBehaviour:
   bossUIContainer: {fileID: 0}
   bossHealthBar: {fileID: 0}
   bossNameText: {fileID: 0}
+--- !u!114 &5900922793283613069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113492406292737456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad192c1793b578479024eb858195573, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::BossDefeatNotifier
+  victoryFanfare: {fileID: 8300000, guid: 4dbfbd1a56081db4ca174255a4d56b1f, type: 3}
 --- !u!1 &130390988292422359
 GameObject:
   m_ObjectHideFlags: 0

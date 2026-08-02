@@ -53,15 +53,13 @@ public class StatManager : MonoBehaviour
         
         UpdateUI();
         
+        // --- UPDATED: PlayerController.Die() is now the single source of truth for defeat
+        // (it mirrors this exact health value into StatManager every frame). Triggering
+        // the Defeat_Panel from here too would fire it twice, so this now just tracks the
+        // number for the HUD/upgrades and lets PlayerController own the actual death event.
         if (currentHealth == 0)
         {
             Debug.Log("The King has fallen!");
-            
-            // Trigger the Defeat Screen
-            if (GameOverlayManager.Instance != null)
-            {
-                GameOverlayManager.Instance.TriggerDefeat();
-            }
         }
     }
 

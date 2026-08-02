@@ -4,17 +4,12 @@ using UnityEngine.UI;
 namespace BloodlinesUI
 {
     /// <summary>
-    /// Sound manager for controlling audio settings
+    /// Sound manager for controlling audio settings with separated Master, BGM, and SFX channels.
     /// </summary>
     public class SoundManager : MonoBehaviour
     {
         public static SoundManager Instance { get; private set; }
 
-        /// <summary>
-        /// Resets static state before each Play session.
-        /// Required because 'Fast Enter Play Mode' (default since Unity 6) does not
-        /// reload the domain, so static fields keep their values between sessions.
-        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
@@ -22,20 +17,27 @@ namespace BloodlinesUI
         }
 
         [Header("Audio Components")]
-        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioSource audioSource; // Used for UI SFX
+        [SerializeField] private AudioSource bgmSource;   // Used for Background Music
         
         [Header("UI Controls")]
         [SerializeField] private Toggle soundToggle;
-        [SerializeField] private Slider volumeSlider;
+        [SerializeField] private Slider masterVolumeSlider;
+        [SerializeField] private Slider bgmVolumeSlider;
+        [SerializeField] private Slider sfxVolumeSlider;
         
         [Header("Default Values")]
-        [SerializeField] private float defaultVolume = 0.8f;
+        [SerializeField] private float defaultMasterVolume = 1.0f;
+        [SerializeField] private float defaultBgmVolume = 0.8f;
+        [SerializeField] private float defaultSfxVolume = 0.8f;
         [SerializeField] private bool defaultSoundEnabled = true;
         [SerializeField] private float defaultHoverScale = 0.5f;
         [SerializeField] private float defaultClickScale = 0.7f;
         
         private bool isSoundEnabled = true;
-        private float currentVolume = 0.8f;
+        private float masterVolume = 1.0f;
+        private float bgmVolume = 0.8f;
+        private float sfxVolume = 0.8f;
         private float hoverScale = 0.5f;
         private float clickScale = 0.7f;
         
@@ -44,10 +46,6 @@ namespace BloodlinesUI
             if (Instance == null)
             {
                 Instance = this;
-                // DontDestroyOnLoad only works on root GameObjects. In the demo scene
-                // this manager lives as a UI element under a Canvas, and detaching a UI
-                // child from its Canvas would break its rendering. So only persist across
-                // scenes when this object is actually a root object.
                 if (transform.parent == null)
                 {
                     DontDestroyOnLoad(gameObject);
@@ -66,22 +64,21 @@ namespace BloodlinesUI
             SetupAudioSource();
         }
         
-        /// <summary>
-        /// Initialize audio settings
-        /// </summary>
         private void InitializeAudio()
         {
             isSoundEnabled = PlayerPrefs.GetInt("SoundEnabled", defaultSoundEnabled ? 1 : 0) == 1;
-            currentVolume = PlayerPrefs.GetFloat("MasterVolume", defaultVolume);
+            
+            // Load individual volumes from memory
+            masterVolume = PlayerPrefs.GetFloat("MasterVolume", defaultMasterVolume);
+            bgmVolume = PlayerPrefs.GetFloat("BGMVolume", defaultBgmVolume);
+            sfxVolume = PlayerPrefs.GetFloat("SFXVolume", defaultSfxVolume);
+            
             hoverScale = PlayerPrefs.GetFloat("HoverScale", defaultHoverScale);
             clickScale = PlayerPrefs.GetFloat("ClickScale", defaultClickScale);
             
             ApplyAudioSettings();
         }
         
-        /// <summary>
-        /// Setup UI control elements
-        /// </summary>
         private void SetupUIControls()
         {
             if (soundToggle != null)
@@ -90,36 +87,40 @@ namespace BloodlinesUI
                 soundToggle.onValueChanged.AddListener(OnSoundToggleChanged);
             }
             
-            if (volumeSlider != null)
+            // Hook up the 3 UI Sliders
+            if (masterVolumeSlider != null)
             {
-                volumeSlider.value = currentVolume;
-                volumeSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
+                masterVolumeSlider.value = masterVolume;
+                masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
+            }
+            
+            if (bgmVolumeSlider != null)
+            {
+                bgmVolumeSlider.value = bgmVolume;
+                bgmVolumeSlider.onValueChanged.AddListener(OnBgmVolumeChanged);
+            }
+            
+            if (sfxVolumeSlider != null)
+            {
+                sfxVolumeSlider.value = sfxVolume;
+                sfxVolumeSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
             }
         }
         
-        /// <summary>
-        /// Setup AudioSource
-        /// </summary>
         private void SetupAudioSource()
         {
-            if (audioSource == null)
-            {
-                audioSource = GetComponent<AudioSource>();
-            }
-            
-            if (audioSource == null)
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-            }
-            
+            // Setup SFX Source
+            if (audioSource == null) audioSource = GetComponent<AudioSource>();
+            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.loop = false;
+
+            // Setup BGM Source
+            if (bgmSource == null) bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.playOnAwake = false;
+            bgmSource.loop = true; 
         }
         
-        /// <summary>
-        /// Sound toggle state change handler
-        /// </summary>
-        /// <param name="isEnabled">Is sound enabled</param>
         public void OnSoundToggleChanged(bool isEnabled)
         {
             isSoundEnabled = isEnabled;
@@ -129,105 +130,87 @@ namespace BloodlinesUI
             ApplyAudioSettings();
         }
         
-        /// <summary>
-        /// Volume slider value change handler
-        /// </summary>
-        /// <param name="volume">New volume value</param>
-        public void OnVolumeSliderChanged(float volume)
+        // --- Independent Volume Slider Handlers ---
+        public void OnMasterVolumeChanged(float volume)
         {
-            currentVolume = volume;
+            masterVolume = volume;
             PlayerPrefs.SetFloat("MasterVolume", volume);
             PlayerPrefs.Save();
-            
+            ApplyAudioSettings();
+        }
+
+        public void OnBgmVolumeChanged(float volume)
+        {
+            bgmVolume = volume;
+            PlayerPrefs.SetFloat("BGMVolume", volume);
+            PlayerPrefs.Save();
+            ApplyAudioSettings();
+        }
+
+        public void OnSfxVolumeChanged(float volume)
+        {
+            sfxVolume = volume;
+            PlayerPrefs.SetFloat("SFXVolume", volume);
+            PlayerPrefs.Save();
             ApplyAudioSettings();
         }
         
-        /// <summary>
-        /// Apply audio settings
-        /// </summary>
         private void ApplyAudioSettings()
         {
+            // SFX is a combination of Master Volume and SFX Volume
             if (audioSource != null)
             {
-                audioSource.volume = isSoundEnabled ? currentVolume : 0f;
+                audioSource.volume = isSoundEnabled ? (masterVolume * sfxVolume) : 0f;
+            }
+            
+            // BGM is a combination of Master Volume and BGM Volume
+            if (bgmSource != null)
+            {
+                bgmSource.volume = isSoundEnabled ? (masterVolume * bgmVolume) : 0f;
+            }
+        }
+
+        public void PlayBGM(AudioClip musicClip)
+        {
+            if (bgmSource != null && musicClip != null)
+            {
+                if (bgmSource.clip == musicClip && bgmSource.isPlaying) return; 
+                
+                bgmSource.clip = musicClip;
+                bgmSource.Play();
             }
         }
         
-        /// <summary>
-        /// Play sound
-        /// </summary>
-        /// <param name="clip">Audio clip</param>
-        /// <param name="volume">Volume (0-1)</param>
         public void PlaySound(AudioClip clip, float volume = 1f)
         {
             if (audioSource != null && clip != null && isSoundEnabled)
             {
-                audioSource.PlayOneShot(clip, volume);
+                audioSource.PlayOneShot(clip, volume * masterVolume * sfxVolume);
             }
         }
         
-        /// <summary>
-        /// Play hover sound
-        /// </summary>
-        /// <param name="clip">Audio clip</param>
         public void PlayHoverSound(AudioClip clip)
         {
             if (audioSource != null && clip != null && isSoundEnabled)
             {
-                audioSource.PlayOneShot(clip, currentVolume * hoverScale);
+                audioSource.PlayOneShot(clip, masterVolume * sfxVolume * hoverScale);
             }
         }
         
-        /// <summary>
-        /// Play click sound
-        /// </summary>
-        /// <param name="clip">Audio clip</param>
         public void PlayClickSound(AudioClip clip)
         {
             if (audioSource != null && clip != null && isSoundEnabled)
             {
-                audioSource.PlayOneShot(clip, currentVolume * clickScale);
+                audioSource.PlayOneShot(clip, masterVolume * sfxVolume * clickScale);
             }
         }
         
-        /// <summary>
-        /// Enable/disable sound programmatically
-        /// </summary>
-        /// <param name="enabled">Enable sound</param>
         public void SetSoundEnabled(bool enabled)
         {
-            if (soundToggle != null)
-            {
-                soundToggle.isOn = enabled;
-            }
-            else
-            {
-                OnSoundToggleChanged(enabled);
-            }
+            if (soundToggle != null) soundToggle.isOn = enabled;
+            else OnSoundToggleChanged(enabled);
         }
         
-        /// <summary>
-        /// Set volume programmatically
-        /// </summary>
-        /// <param name="volume">Volume value (0-1)</param>
-        public void SetVolume(float volume)
-        {
-            volume = Mathf.Clamp01(volume);
-            
-            if (volumeSlider != null)
-            {
-                volumeSlider.value = volume;
-            }
-            else
-            {
-                OnVolumeSliderChanged(volume);
-            }
-        }
-        
-        /// <summary>
-        /// Set hover volume scale
-        /// </summary>
-        /// <param name="scale">Scale factor (0-1)</param>
         public void SetHoverScale(float scale)
         {
             hoverScale = Mathf.Clamp01(scale);
@@ -235,10 +218,6 @@ namespace BloodlinesUI
             PlayerPrefs.Save();
         }
         
-        /// <summary>
-        /// Set click volume scale
-        /// </summary>
-        /// <param name="scale">Scale factor (0-1)</param>
         public void SetClickScale(float scale)
         {
             clickScale = Mathf.Clamp01(scale);
@@ -246,58 +225,20 @@ namespace BloodlinesUI
             PlayerPrefs.Save();
         }
         
-        /// <summary>
-        /// Get current sound state
-        /// </summary>
-        /// <returns>Is sound enabled</returns>
-        public bool IsSoundEnabled()
-        {
-            return isSoundEnabled;
-        }
-        
-        /// <summary>
-        /// Get current volume
-        /// </summary>
-        /// <returns>Current volume (0-1)</returns>
-        public float GetCurrentVolume()
-        {
-            return currentVolume;
-        }
-        
-        /// <summary>
-        /// Get hover volume scale
-        /// </summary>
-        /// <returns>Hover scale (0-1)</returns>
-        public float GetHoverScale()
-        {
-            return hoverScale;
-        }
-        
-        /// <summary>
-        /// Get click volume scale
-        /// </summary>
-        /// <returns>Click scale (0-1)</returns>
-        public float GetClickScale()
-        {
-            return clickScale;
-        }
+        public bool IsSoundEnabled() { return isSoundEnabled; }
+        public float GetMasterVolume() { return masterVolume; }
+        public float GetBgmVolume() { return bgmVolume; }
+        public float GetSfxVolume() { return sfxVolume; }
+        public float GetHoverScale() { return hoverScale; }
+        public float GetClickScale() { return clickScale; }
         
         private void OnDestroy()
         {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-
-            if (soundToggle != null)
-            {
-                soundToggle.onValueChanged.RemoveListener(OnSoundToggleChanged);
-            }
-            
-            if (volumeSlider != null)
-            {
-                volumeSlider.onValueChanged.RemoveListener(OnVolumeSliderChanged);
-            }
+            if (Instance == this) Instance = null;
+            if (soundToggle != null) soundToggle.onValueChanged.RemoveListener(OnSoundToggleChanged);
+            if (masterVolumeSlider != null) masterVolumeSlider.onValueChanged.RemoveListener(OnMasterVolumeChanged);
+            if (bgmVolumeSlider != null) bgmVolumeSlider.onValueChanged.RemoveListener(OnBgmVolumeChanged);
+            if (sfxVolumeSlider != null) sfxVolumeSlider.onValueChanged.RemoveListener(OnSfxVolumeChanged);
         }
     }
 }

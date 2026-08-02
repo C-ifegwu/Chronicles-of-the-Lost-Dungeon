@@ -41,13 +41,7 @@ public class InventorySorter : MonoBehaviour
 
     private void Start()
     {
-        // Adding dummy items to test the sorting algorithm
-        kingsLoot.Add(new LootItem("Basic Rations", 10));
-        kingsLoot.Add(new LootItem("Elixir of Vitality", 500));
-        kingsLoot.Add(new LootItem("Elixir of Vitality", 500)); // Added a second to test the UI count
-        kingsLoot.Add(new LootItem("Warden's Key", 1000));
-        kingsLoot.Add(new LootItem("Rusty Sword", 15));
-        
+        // Sort whatever loot the King is already carrying (e.g. from a loaded save) when the level starts
         SortInventory();
     }
 
@@ -55,6 +49,16 @@ public class InventorySorter : MonoBehaviour
     {
         kingsLoot.Add(new LootItem(name, value));
         SortInventory();
+    }
+
+    // --- NEW: Checks whether a specific item currently exists in the King's inventory ---
+    public bool HasItem(string itemName)
+    {
+        foreach (LootItem item in kingsLoot)
+        {
+            if (item.itemName == itemName) return true;
+        }
+        return false;
     }
 
     public void SortInventory()

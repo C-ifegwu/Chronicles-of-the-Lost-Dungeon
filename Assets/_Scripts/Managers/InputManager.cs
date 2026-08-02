@@ -7,6 +7,7 @@ public class InputManager : MonoBehaviour
     public Vector2 MoveInput { get; private set; }
     public bool MeleeTriggered { get; private set; }
     public bool SpecialTriggered { get; private set; }
+    public bool RangedTriggered { get; private set; }
     public bool IsBlocking { get; private set; }
     public bool IsSprinting { get; private set; }
     public bool JumpTriggered { get; private set; }
@@ -32,6 +33,7 @@ public class InputManager : MonoBehaviour
         MeleeTriggered = Input.GetMouseButtonDown(0);
         IsBlocking = Input.GetMouseButton(1);
         SpecialTriggered = Input.GetKeyDown(KeyCode.E);
+        RangedTriggered = Input.GetKeyDown(KeyCode.Q);
         IsSprinting = Input.GetKey(KeyCode.LeftShift); 
         
         JumpTriggered = Input.GetKeyDown(KeyCode.Space);

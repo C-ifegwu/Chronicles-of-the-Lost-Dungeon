@@ -4397,23 +4397,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 440006, guid: 98ea3f81640ee854ca16574a1b280d2c, type: 3}
   m_PrefabInstance: {fileID: 455569355}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &458934790 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7645072097207729385, guid: 5eb259a5d7c540443b29b78401b886a9, type: 3}
-  m_PrefabInstance: {fileID: 1062614733}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &458934797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 458934790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fad192c1793b578479024eb858195573, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GameAssembly::BossDefeatNotifier
 --- !u!1001 &467663623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6172,6 +6155,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 458024, guid: d2522dcf0fb8d6b4aa4ddd10c405746a, type: 3}
   m_PrefabInstance: {fileID: 705667976}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &706853918
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 571.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 321.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102824388823874348, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844063199686724796, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: m_Name
+      value: Level1_VictoryManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911976297951780670, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: levelToUnlock
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911976297951780670, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: nextLevelName
+      value: Level3_PrisonRooftop
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911976297951780670, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
+      propertyPath: portalSpawnPoint
+      value: 
+      objectReference: {fileID: 1662173666}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1e0510a2daf89bf4ab6c81cbb949e1ab, type: 3}
 --- !u!1001 &711758193
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10105,10 +10157,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7645072097207729385, guid: 5eb259a5d7c540443b29b78401b886a9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 458934797}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5eb259a5d7c540443b29b78401b886a9, type: 3}
 --- !u!1001 &1075115128
 PrefabInstance:
@@ -17222,7 +17271,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1763396349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17239,6 +17288,11 @@ MonoBehaviour:
   portalPrefab: {fileID: 4617036660772024948, guid: 52c7d057cba585641bb68312c10d7791, type: 3}
   portalSpawnPoint: {fileID: 1662173666}
   nextLevelName: Level3_PrisonRooftop
+  levelToUnlock: 2
+  enemiesSlainThisLevel: 12
+  potionsUsedThisLevel: 2
+  enemiesSlainTextUI: {fileID: 0}
+  potionsUsedTextUI: {fileID: 0}
 --- !u!4 &1763396350
 Transform:
   m_ObjectHideFlags: 0
@@ -20556,6 +20610,51 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 466154, guid: 6f4b137e447fb8d449da53d5bf77a303, type: 3}
   m_PrefabInstance: {fileID: 2010955650}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2011622810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2011622812}
+  - component: {fileID: 2011622811}
+  m_Layer: 0
+  m_Name: LevelMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2011622811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011622810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7197390a9541d44b8180086ba18f362, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameAssembly::SceneMusicPlayer
+  sceneMusic: {fileID: 8300000, guid: 3f9d2a49059160546818cd858b1adc43, type: 3}
+--- !u!4 &2011622812
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011622810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 623.49084, y: 0.00001, z: -10951.269}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2013497677
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22186,3 +22285,5 @@ SceneRoots:
   - {fileID: 643846324}
   - {fileID: 97835604}
   - {fileID: 889812142}
+  - {fileID: 2011622812}
+  - {fileID: 706853918}

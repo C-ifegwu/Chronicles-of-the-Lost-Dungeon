@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class LevelManager : MonoBehaviour
     [Header("Level Cards (Assign Levels 1 to 5)")]
     public LevelCard[] levelCards;
 
+    [Header("Scene Names (Index 0 = Level 1, Index 1 = Level 2, etc.)")]
+    public string[] sceneNames = { "Level1_TrainingPit", "Level2_Dungeons", "Level3_PrisonRooftop", "Level4_Ward", "Level5_ThroneRoom" };
+
     private void OnEnable()
     {
         // This runs every time the Chronicles panel is opened
@@ -23,8 +27,13 @@ public class LevelManager : MonoBehaviour
 
     public void RefreshLevelLocks()
     {
-        // Fetches saved progress. If no save exists, defaults to Level 1.
-        int maxUnlocked = PlayerPrefs.GetInt("HighestUnlockedLevel", 1);
+        // --- UPDATED: Read from the same JSON save data MainMenuManager and VictoryManager
+        // use, instead of PlayerPrefs. Keeps unlocks consistent everywhere in the game.
+        int maxUnlocked = 1;
+        if (SaveManager.Instance != null && SaveManager.Instance.currentData != null)
+        {
+            maxUnlocked = SaveManager.Instance.currentData.highestUnlockedLevel;
+        }
 
         for (int i = 0; i < levelCards.Length; i++)
         {
@@ -52,6 +61,26 @@ public class LevelManager : MonoBehaviour
                     levelCards[i].statusText.color = Color.white;
                 }
             }
+        }
+    }
+
+    public void LoadLevel(int index)
+    {
+        if (index >= 0 && index < sceneNames.Length)
+        {
+            string targetScene = sceneNames[index];
+            if (SceneTransitionManager.Instance != null)
+            {
+                SceneTransitionManager.Instance.LoadNextLevel(targetScene);
+            }
+            else
+            {
+                SceneManager.LoadScene(targetScene);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Invalid level index provided: " + index);
         }
     }
 }

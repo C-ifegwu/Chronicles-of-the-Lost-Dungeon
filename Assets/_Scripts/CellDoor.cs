@@ -20,15 +20,13 @@ public class CellDoor : MonoBehaviour, IInteractable
     {
         if (isUnlocked || isOpening) return;
 
-        // TEMPORARILY COMMENTED OUT to avoid CS0246 errors.
-        /*
-        QuickSortInventory inventory = Object.FindAnyObjectByType<QuickSortInventory>();
-        if (inventory == null || !inventory.HasItem(requiredKeyID))
+        // --- UPDATED: Reconnected to the real InventorySorter (the old QuickSortInventory
+        // reference no longer exists, which is why this check was disabled before).
+        if (InventorySorter.Instance == null || !InventorySorter.Instance.HasItem(requiredKeyID))
         {
-            Debug.Log("You need the Warden's Key to open this!");
+            Debug.Log($"[CELL DOOR] You need the {requiredKeyID} to open this!");
             return;
         }
-        */
 
         UnlockAndOpen();
     }

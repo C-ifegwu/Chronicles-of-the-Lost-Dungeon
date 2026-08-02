@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float staminaRegenRate = 10f; // Adjusted for better pacing
     [SerializeField] private float meleeStaminaCost = 15f;
     [SerializeField] private float specialStaminaCost = 40f;
+    [SerializeField] private float rangedStaminaCost = 20f;
+    [SerializeField] private float dodgeStaminaCost = 20f;
     
     // --- NEW: Exhaustion Delay Variables ---
     [Tooltip("How many seconds to wait after an attack before stamina starts recovering.")]
@@ -29,11 +31,27 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private float gravity = 9.81f;
 
+    // --- NEW: Dodge Variables ---
+    [Header("Dodge")]
+    [SerializeField] private float dodgeDistance = 4f;
+    [SerializeField] private float dodgeDuration = 0.2f;
+    [SerializeField] private float dodgeCooldown = 1.0f;
+    private float dodgeCooldownTimer = 0f;
+    private bool isDodging = false;
+
+    // --- NEW: Combat Audio Variables ---
+    [Header("Audio")]
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioClip swingSound;
+    [SerializeField] private AudioClip weaponHitSound; 
+    [SerializeField] private AudioClip takeDamageSound;
+
     private CharacterController characterController;
     private PlayerAnimator playerAnimator;
     private Animator animator; 
     private IAbility currentMeleeAbility;
     private IAbility currentSpecialAbility; 
+    private IAbility currentRangedAbility;
     
     private IInteractable currentInteractable = null;
     private float verticalVelocity;
@@ -54,7 +72,14 @@ public class PlayerController : MonoBehaviour, IDamageable
         
         currentMeleeAbility = GetComponent<MeleeAbility>();
         currentSpecialAbility = GetComponent<SpecialAbility>(); 
+        currentRangedAbility = GetComponent<RangedAbility>();
         
+        // --- NEW: Auto-setup AudioSource ---
+        if (playerAudioSource == null) playerAudioSource = GetComponent<AudioSource>();
+        if (playerAudioSource == null) playerAudioSource = gameObject.AddComponent<AudioSource>();
+        playerAudioSource.playOnAwake = false;
+        playerAudioSource.spatialBlend = 1f; // Makes it 3D so it comes directly from the King
+
         if (Camera.main != null)
         {
             mainCameraTransform = Camera.main.transform;
@@ -69,6 +94,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         HandleDefense(); 
         HandleStamina();
         HandleCombat();
+        HandleDodge();
         HandleInteraction(); 
 
         // Forces the StatManager to mirror the King's internal math
@@ -82,6 +108,21 @@ public class PlayerController : MonoBehaviour, IDamageable
     private void HandleMovement()
     {
         if (InputManager.Instance == null) return;
+
+        // --- NEW: While dodging, DodgeRoutine fully owns horizontal movement.
+        // Gravity still ticks so the King doesn't float mid-dodge.
+        if (isDodging)
+        {
+            if (characterController.isGrounded)
+            {
+                verticalVelocity = -0.5f;
+            }
+            else
+            {
+                verticalVelocity -= gravity * Time.deltaTime;
+            }
+            return;
+        }
         
         Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
@@ -148,7 +189,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void HandleStamina()
     {
-        // --- NEW: Tick down the exhaustion timer first ---
+        // Tick down the exhaustion timer first
         if (regenTimer > 0)
         {
             regenTimer -= Time.deltaTime;
@@ -172,9 +213,15 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (currentStamina >= meleeStaminaCost)
             {
                 currentStamina -= meleeStaminaCost;
-                regenTimer = staminaRegenDelay; // --- NEW: Reset the delay timer ---
+                regenTimer = staminaRegenDelay; 
                 currentMeleeAbility.Execute();
                 MakeNoise(8f); 
+                
+                // --- NEW: Play Swing Sound ---
+                if (playerAudioSource != null && swingSound != null)
+                {
+                    playerAudioSource.PlayOneShot(swingSound);
+                }
             }
             else
             {
@@ -186,15 +233,77 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (currentStamina >= specialStaminaCost)
             {
                 currentStamina -= specialStaminaCost;
-                regenTimer = staminaRegenDelay; // --- NEW: Reset the delay timer ---
+                regenTimer = staminaRegenDelay; 
                 currentSpecialAbility.Execute();
                 MakeNoise(15f); 
+                
+                // --- NEW: Play Heavy/Special Swing Sound ---
+                if (playerAudioSource != null && swingSound != null)
+                {
+                    // Slightly lowering the pitch makes the heavy attack sound much heavier!
+                    playerAudioSource.pitch = 0.8f; 
+                    playerAudioSource.PlayOneShot(swingSound);
+                    playerAudioSource.pitch = 1.0f; // Reset pitch immediately after
+                }
             }
             else
             {
                 Debug.Log("Not enough stamina for a shield bash!");
             }
         }
+        else if (InputManager.Instance.RangedTriggered && currentRangedAbility != null)
+        {
+            if (currentStamina >= rangedStaminaCost)
+            {
+                currentStamina -= rangedStaminaCost;
+                regenTimer = staminaRegenDelay;
+                currentRangedAbility.Execute();
+                MakeNoise(10f);
+
+                // --- NEW: Play Ranged Shot Sound (reuses the swing clip if a dedicated one isn't set) ---
+                if (playerAudioSource != null && swingSound != null)
+                {
+                    playerAudioSource.PlayOneShot(swingSound);
+                }
+            }
+            else
+            {
+                Debug.Log("Not enough stamina for a ranged shot!");
+            }
+        }
+    }
+
+    // --- NEW: Handles the Dodge input declared in InputManager but never wired to any movement. ---
+    private void HandleDodge()
+    {
+        if (dodgeCooldownTimer > 0) dodgeCooldownTimer -= Time.deltaTime;
+
+        if (InputManager.Instance == null || isDodging) return;
+
+        if (InputManager.Instance.DodgeTriggered && dodgeCooldownTimer <= 0 && currentStamina >= dodgeStaminaCost)
+        {
+            currentStamina -= dodgeStaminaCost;
+            regenTimer = staminaRegenDelay;
+            dodgeCooldownTimer = dodgeCooldown;
+            StartCoroutine(DodgeRoutine());
+        }
+    }
+
+    private System.Collections.IEnumerator DodgeRoutine()
+    {
+        isDodging = true;
+        Vector3 dodgeDirection = transform.forward;
+        float elapsed = 0f;
+
+        while (elapsed < dodgeDuration)
+        {
+            float step = (dodgeDistance / dodgeDuration) * Time.deltaTime;
+            if (characterController != null) characterController.Move(dodgeDirection * step);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        isDodging = false;
     }
 
     private void MakeNoise(float noiseRadius)
@@ -218,11 +327,18 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (isBlocking)
         {
             Debug.Log("Attack Blocked! No health lost and no flinch.");
+            // Optional: You could play a block sound here in the future
             return; 
         }
 
         currentHealth -= damageAmount;
         GameEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
+        
+        // --- NEW: Play Hurt Sound ---
+        if (playerAudioSource != null && takeDamageSound != null)
+        {
+            playerAudioSource.PlayOneShot(takeDamageSound);
+        }
 
         if (currentHealth > 0)
         {
@@ -242,7 +358,17 @@ public class PlayerController : MonoBehaviour, IDamageable
         
         if (characterController != null) characterController.enabled = false;
 
-        StartCoroutine(RestartLevelRoutine());
+        // --- UPDATED: Route through the level's Defeat_Panel (GameOverlayManager) when
+        // it exists, so the King gets a Restart button instead of an automatic reload.
+        // Falls back to the old auto-reload behavior for any level missing the overlay.
+        if (GameOverlayManager.Instance != null)
+        {
+            GameOverlayManager.Instance.TriggerDefeat();
+        }
+        else
+        {
+            StartCoroutine(RestartLevelRoutine());
+        }
 
         this.enabled = false;
     }
@@ -269,7 +395,14 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (currentStamina > maxStamina) currentStamina = maxStamina;
     }
 
-    // --- ONLY THE THREE METHODS BELOW WERE CHANGED ---
+    // --- NEW: Public method so your weapons can trigger the hit sound when they connect ---
+    public void PlayWeaponHitSound()
+    {
+        if (playerAudioSource != null && weaponHitSound != null)
+        {
+            playerAudioSource.PlayOneShot(weaponHitSound);
+        }
+    }
 
     private void HandleInteraction()
     {
@@ -279,7 +412,6 @@ public class PlayerController : MonoBehaviour, IDamageable
             {
                 currentInteractable.Interact(this);
                 
-                // Hide the UI banner once the item is picked up/used
                 if (InteractionPromptUI.Instance != null)
                 {
                     InteractionPromptUI.Instance.HidePrompt();
@@ -297,7 +429,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             currentInteractable = interactable;
             
-            // Send the interact text to your UI banner instead of the console
             if (InteractionPromptUI.Instance != null)
             {
                 InteractionPromptUI.Instance.ShowPrompt($"Press 'F' to: {currentInteractable.GetInteractText()}");
@@ -312,7 +443,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             currentInteractable = null;
             
-            // Hide the UI banner when the King walks away from the item
             if (InteractionPromptUI.Instance != null)
             {
                 InteractionPromptUI.Instance.HidePrompt();

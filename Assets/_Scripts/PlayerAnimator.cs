@@ -54,6 +54,13 @@ public class PlayerAnimator : MonoBehaviour
         if (animator != null) animator.SetTrigger("SpecialAttack");
     }
 
+    // --- NEW: Ranged attack command (safe no-op if the Animator Controller doesn't
+    // have a "RangedAttack" trigger parameter yet). ---
+    public void TriggerRanged()
+    {
+        if (animator != null) animator.SetTrigger("RangedAttack");
+    }
+
     // --- REACTION COMMANDS ---
     public void TriggerHit()
     {

@@ -6553,6 +6553,10 @@ MonoBehaviour:
   rotationSpeed: 5
   jumpForce: 5
   gravity: 15
+  playerAudioSource: {fileID: 0}
+  swingSound: {fileID: 8300000, guid: 7053294e066eb1945baa4d9cc9194f15, type: 3}
+  weaponHitSound: {fileID: 8300000, guid: f066f3ebedc79dc429b921d5076e5491, type: 3}
+  takeDamageSound: {fileID: 8300000, guid: 40cda279da2faea43ad6582184440a70, type: 3}
 --- !u!114 &4757530605621158534
 MonoBehaviour:
   m_ObjectHideFlags: 0

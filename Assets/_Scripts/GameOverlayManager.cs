@@ -50,7 +50,36 @@ public class GameOverlayManager : MonoBehaviour
     public void LoadNextLevel()
     {
         Time.timeScale = 1f; 
-        // Loads the next scene in your Unity Build Settings queue
+
+        // --- UPDATED: Ask the VictoryManager where to go instead of blindly loading
+        // "buildIndex + 1". This respects the level's configured next scene and
+        // correctly sends the King back to the Main Menu once the game is finished.
+        if (VictoryManager.Instance != null && VictoryManager.Instance.isFinalLevel)
+        {
+            LoadSceneByName("MainMenu_Scene");
+            return;
+        }
+
+        if (VictoryManager.Instance != null && !string.IsNullOrEmpty(VictoryManager.Instance.nextLevelName))
+        {
+            LoadSceneByName(VictoryManager.Instance.nextLevelName);
+            return;
+        }
+
+        // Fallback for any level that doesn't have a VictoryManager configured yet
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    // --- NEW: Routes through the SceneTransitionManager (loading screen) when available ---
+    private void LoadSceneByName(string sceneName)
+    {
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.LoadNextLevel(sceneName);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
     }
 }
